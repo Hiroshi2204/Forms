@@ -1,11 +1,7 @@
 <?php
 
-use ColorSeeder as GlobalColorSeeder;
-use Database\Seeders\ColorSeeder;
-use Database\Seeders\ProductoSeeder;
+
 use Illuminate\Database\Seeder;
-use ProductoSeeder as GlobalProductoSeeder;
-use TipoRolSeeder as GlobalTipoRolSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,7 +14,7 @@ class DatabaseSeeder extends Seeder
         {
                 $this->call(UserSeeder::class);
                 $this->call(TipoDocumentoSeeder::class);
-                $this->call(RolSeeder::class);
-                $this->call(GlobalTipoRolSeeder::class);
+                $this->call(TipoDocSeeder::class);
+                $this->call(TipoDocDetalleSeeder::class);
         }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRolTable extends Migration
+class CreateTipoDocDetalleTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateRolTable extends Migration
      */
     public function up()
     {
-        Schema::create('rol', function (Blueprint $table) {
+        Schema::create('tipo_doc_detalle', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->nullable();
+            $table->foreignId('tipo_doc_id')->nullable()->references('id')->on('tipo_doc');
             $table->char('estado_registro')->default('A');
             $table->timestamps();
         });
@@ -28,6 +29,6 @@ class CreateRolTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('rol');
+        Schema::dropIfExists('tipo_doc_detalle');
     }
 }
