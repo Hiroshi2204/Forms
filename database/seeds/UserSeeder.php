@@ -23,11 +23,11 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id"=>$user1->id,
-                "username"=>"rectorado",
+                "username"=>"facultades",
 
             ],
             [
-                "password"=>"rectorado123",
+                "password"=>"facultades123",
             ]
         );
         //------------------------------------------------
@@ -45,23 +45,6 @@ class UserSeeder extends Seeder
             ],
             [
                 "password"=>"secretario123",
-            ]
-        );
-        //------------------------------------------------
-        $user3 = Oficina::firstOrCreate(
-            [
-                "nombre"=>"Facultades",
-                "cargo_oficina_id"=>2
-            ]
-        );
-        $usuario = User::firstOrCreate(
-            [
-                "oficina_id"=>$user3->id,
-                "username"=>"rectorado1",
-
-            ],
-            [
-                "password"=>"secretario1234",
             ]
         );
     }

@@ -21,26 +21,29 @@ class AuthController extends Controller
     public function authenticate(Request $request)
     {
         //return response()->json($request);
-        /*$username = $request->input('username');
-        $password = $request->input('password');*/
+        $username = $request->input('username');
+        $password = $request->input('password');
         $credentials = $request->only('username', 'password');
         $usernameu = User::where('username', $request->username)->first();
-        if (!$usernameu) return redirect()->route('login');/*return response()->json(["error" => "El nombre de usuario no existe"], 400);*/
+        if (!$usernameu) /*return redirect()->route('login');*/
+            return response()->json(["error" => "El nombre de usuario no existe"], 400);
+
         $user = User::with('oficina')->where('username', $request->username)->where('estado_registro', 'A')->first();
 
-        if (!$user) return redirect()->route('login');/*return response()->json(['error' => 'Usuario bloqueado'], 402);*/
+        if (!$user) /*return redirect()->route('login');*/
+            return response()->json(['error' => 'Usuario bloqueado'], 402);
 
         try {
             $this->cambiarDuracionToken();
             if (!$token = FacadesJWTAuth::attempt($credentials)) {
-                //return response()->json(['error' => 'invalid_credentials'], 403);
-                return redirect()->route('login')->with('error', 'invalid_credentials');
+                return response()->json(['error' => 'invalid_credentials'], 403);
+                //return redirect()->route('login')->with('error', 'invalid_credentials');
             }
         } catch (JWTException $e) {
-            //return response()->json(['error' => 'could_not_create_token'], 500);
-            return redirect()->route('login')->with('error', 'could_not_create_token');
+            return response()->json(['error' => 'could_not_create_token'], 500);
+            //return redirect()->route('login')->with('error', 'could_not_create_token');
         }
-        //session(['username' => $username]);
+        session(['username' => $username]);
         $response = array(
             "id" => $user->id,
             "oficina_id" => $user->oficina_id,
@@ -48,8 +51,8 @@ class AuthController extends Controller
             "oficina" => $user->oficina,
         );
         $response['token'] = $token;
-        return redirect()->intended("/formulario/{$user->id}");
-        //return response()->json($response);
+        //return redirect()->intended("/formulario/{$user->id}");
+        return response()->json($response);
     }
 
 
@@ -77,7 +80,7 @@ class AuthController extends Controller
     public function my()
     {
         $my = User::with('persona')->find(auth()->user()->id);
-        
+
         $response = array(
             "id" => $my->id,
             "persona_id" => $my->persona_id,
@@ -102,18 +105,17 @@ class AuthController extends Controller
         // Confirmar la nueva contraseña
         $confirm_Password = $request->confirm_Password;
 
-        if (Hash::check($current_password, $usuario->password)){
+        if (Hash::check($current_password, $usuario->password)) {
             if ($new_password == $confirm_Password) {
                 $usuario->password = $new_password;
                 $usuario->save();
 
                 return response()->json(['resp' => 'La contraseña ha sido actualizada exitosamente'], 200);
-            }else {
+            } else {
                 return response()->json(['resp' => 'Las contraseñas no COINCIDEN, vuelva a insertar'], 400);
             }
         } else {
-            return response()->json(['resp' => 'La contraseña actual no es correcta, inserte nuevamente.' ], 401);
+            return response()->json(['resp' => 'La contraseña actual no es correcta, inserte nuevamente.'], 401);
         }
     }
-
 }

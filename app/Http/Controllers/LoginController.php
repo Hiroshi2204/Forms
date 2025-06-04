@@ -29,6 +29,8 @@ use Tymon\JWTAuth\JWTAuth;
 
 class LoginController extends Controller
 {
+    
+
     public function mostrar_login()
     {
         return view('mostrar_login');
@@ -56,7 +58,7 @@ class LoginController extends Controller
     public function store(Request $request, $id)
     {
         DB::beginTransaction();
-        
+
         try {
             $request->validate([
                 'pdf' => 'required|file|mimes:pdf|max:10240',
@@ -64,16 +66,9 @@ class LoginController extends Controller
 
             if ($request->hasFile('pdf')) {
                 $archivo = $request->file('pdf');
-
-                // Guarda el archivo con nombre hasheado en 'storage/app/public/pdfs'
                 $pdfPath = $archivo->store('pdfs', 'public');
-
-                // Captura el nombre original del archivo
                 $nombreOriginal = $archivo->getClientOriginalName();
-
                 $user = User::with('oficina')->where('id', $id)->first();
-
-                // Guardar en base de datos incluyendo el nombre original
                 $formulario = Documento::create([
                     'nombre' => $request->nombre,
                     'numero' => $request->numero,

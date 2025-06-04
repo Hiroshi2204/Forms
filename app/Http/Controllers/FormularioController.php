@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\ClaseDocumento;
+use App\Models\Documento;
+use App\Models\TipoTransparenciaDetalle;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class FormularioController extends Controller
+{
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            // $request->validate([
+            //     'pdf' => 'required|file|mimes:pdf|max:10240',
+            //     'nombre' => 'required|string',
+            //     'numero' => 'required|string',
+            //     'anio' => 'required|integer',
+            //     'asunto' => 'required|string',
+            //     'resumen' => 'required|string',
+            //     'fecha_doc' => 'required|date',
+            //     'clase_documento_id' => 'required|integer'
+            // ]);
+
+
+            if ($request->hasFile('pdf')) {
+                $archivo = $request->file('pdf');
+                $pdfPath = $archivo->store('pdfs', 'public');
+                $nombreOriginal = $archivo->getClientOriginalName();
+
+                $user = auth()->user();
+                if (!$user || !$user->oficina) {
+                    return response()->json(['error' => 'Usuario o oficina no encontrada'], 403);
+                }
+
+                $formulario = Documento::create([
+                    'nombre' => $request->nombre,
+                    'numero' => $request->numero,
+                    'anio' => $request->anio,
+                    'asunto' => $request->asunto,
+                    'resumen' => $request->resumen,
+                    'fecha_doc' => $request->fecha_doc,
+                    'fecha_envio' => now(),
+                    'oficina_remitente' => $user->oficina->nombre,
+                    'clase_documento_id' => $request->clase_documento_id,
+                    'pdf_path' => $pdfPath,
+                    'nombre_original_pdf' => $nombreOriginal
+                ]);
+                DB::commit();
+                $formulario->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
+                return response()->json([
+                    'message' => 'Documento creado exitosamente',
+                    'documento' => $formulario
+                ], 201);
+            } else {
+                return response()->json(['error' => 'Archivo PDF no enviado'], 400);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al crear el registro: " . $e->getMessage()], 500);
+        }
+    }
+    public function buscar(Request $request)
+    {
+        $q = $request->input('q');
+        
+
+        $resultados = Documento::where('nombre', 'like', "%$q%")
+            ->orWhere('numero', 'like', "%$q%")
+            ->orWhere('asunto', 'like', "%$q%")
+            ->orWhere('resumen', 'like', "%$q%")
+            ->orWhere('fecha_doc', 'like', "%$q%")
+            ->orWhere('oficina_remitente', 'like', "%$q%")
+            ->orWhere('nombre_original_pdf', 'like', "%$q%")
+            ->get();
+            $resultados->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
+            return response()->json([
+                'documento' => $resultados
+            ]);
+    }
+}

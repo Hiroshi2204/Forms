@@ -26,18 +26,18 @@ Route::get('/', function () {
 
 
 
-Route::get('/login', [LoginController::class, 'mostrar_login'])->name('login');
-Route::post('/login', [AuthController::class, 'authenticate']);
+// Route::get('/login', [LoginController::class, 'mostrar_login'])->name('login');
+// Route::post('/login', [AuthController::class, 'authenticate']);
 
-Route::get('/formulario/{id}', [LoginController::class, 'mostrar_formulario'])->name('mostrar_formulario');
-Route::post('/formulario/{id}', [LoginController::class, 'store']);
+// Route::get('/formulario/{id}', [LoginController::class, 'mostrar_formulario'])->name('mostrar_formulario');
+// Route::post('/formulario/{id}', [LoginController::class, 'store']);
 
-Route::group(['middleware' => ['cors']], function () {
+// Route::group(['middleware' => ['cors']], function () {
 
-    Route::get('/buscar', [LoginController::class, 'buscar'])->name('resolucion.buscar');
-});
-Route::middleware(['web'])->group(function () {
-    // Rutas aquí
+//     Route::get('/buscar', [LoginController::class, 'buscar'])->name('resolucion.buscar');
+// });
+// Route::middleware(['web'])->group(function () {
+//     // Rutas aquí
 
-});
-Route::group(['middleware' => ['jwt.verify', 'cors']], function () {});
+// });
+// Route::group(['middleware' => ['jwt.verify', 'cors']], function () {});
