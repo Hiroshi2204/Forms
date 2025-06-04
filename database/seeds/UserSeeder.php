@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Oficina;
 use App\Models\Persona;
 use App\Models\UserRol;
 use Illuminate\Database\Seeder;
@@ -13,31 +14,55 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $persona = Persona::firstOrCreate(
+        $user1 = Oficina::firstOrCreate(
             [
-                "tipo_documento_id"=>null,
-                "numero_documento"=>"rectorado",
-            ],
-            [
-                "nombres"=>"Administrador",
-                "apellido_paterno"=>"Super",
-                "apellido_materno"=>"Admin",
+                "nombre"=>"Facultades",
+                "cargo_oficina_id"=>1
             ]
         );
         $usuario = User::firstOrCreate(
             [
-                "persona_id"=>$persona->id,
-                "username"=>$persona->numero_documento,
+                "oficina_id"=>$user1->id,
+                "username"=>"rectorado",
 
             ],
             [
-                //"password"=>$persona->numero_documento,
                 "password"=>"rectorado123",
             ]
         );
+        //------------------------------------------------
+        $user2 = Oficina::firstOrCreate(
+            [
+                "nombre"=>"Secretaría General",
+                "cargo_oficina_id"=>1
+            ]
+        );
+        $usuario = User::firstOrCreate(
+            [
+                "oficina_id"=>$user2->id,
+                "username"=>"secretario",
 
-        
+            ],
+            [
+                "password"=>"secretario123",
+            ]
+        );
+        //------------------------------------------------
+        $user3 = Oficina::firstOrCreate(
+            [
+                "nombre"=>"Facultades",
+                "cargo_oficina_id"=>2
+            ]
+        );
+        $usuario = User::firstOrCreate(
+            [
+                "oficina_id"=>$user3->id,
+                "username"=>"rectorado1",
+
+            ],
+            [
+                "password"=>"secretario1234",
+            ]
+        );
     }
-
-    
 }

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Oficina;
 use App\Models\Persona;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -21,7 +22,7 @@ class User extends Authenticatable implements JWTSubject
          * @var array
          */
         protected $fillable = [
-            'name', 'username', 'password','persona_id','estado_registro'
+            'name', 'username', 'password','oficina_id','estado_registro'
         ];
         
 
@@ -48,7 +49,7 @@ class User extends Authenticatable implements JWTSubject
         public function setPasswordAttribute($value){
             $this->attributes['password']=Hash::make($value);
         }
-        public function persona(){
-            return $this->belongsTo(Persona::class,'persona_id','id');
+        public function oficina(){
+            return $this->belongsTo(Oficina::class,'oficina_id','id');
         }
 }

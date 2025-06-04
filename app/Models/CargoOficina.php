@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TipoDoc extends Model
+class CargoOficina extends Model
 {
     use HasFactory;
-    protected $table = 'tipo_doc';
+    protected $table = 'cargo_oficina';
     protected $fillable = array(
-                            'nombre',
+                            'carg_nombre',
+                            'responsable',
                             'estado_registro'
                         );
     protected $primaryKey = 'id';

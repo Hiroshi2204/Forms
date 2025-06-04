@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTipoDocTable extends Migration
+class CreateTipoTransparenciaDetalleTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateTipoDocTable extends Migration
      */
     public function up()
     {
-        Schema::create('tipo_doc', function (Blueprint $table) {
+        Schema::create('tipo_transparencia_detalle', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->nullable();
+            $table->foreignId('tipo_transparencia_id')->nullable()->references('id')->on('tipo_transparencia');
             $table->char('estado_registro')->default('A');
             $table->timestamps();
         });
@@ -28,6 +29,6 @@ class CreateTipoDocTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tipo_doc');
+        Schema::dropIfExists('tipo_transparencia_detalle');
     }
 }

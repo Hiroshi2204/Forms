@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTipoDocDetalleTable extends Migration
+class CreateCargoOficinaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateTipoDocDetalleTable extends Migration
      */
     public function up()
     {
-        Schema::create('tipo_doc_detalle', function (Blueprint $table) {
+        Schema::create('cargo_oficina', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->nullable();
-            $table->foreignId('tipo_doc_id')->nullable()->references('id')->on('tipo_doc');
+            $table->string('carg_nombre')->nullable();
+            $table->string('responsable')->nullable();
             $table->char('estado_registro')->default('A');
             $table->timestamps();
         });
@@ -29,6 +29,6 @@ class CreateTipoDocDetalleTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tipo_doc_detalle');
+        Schema::dropIfExists('cargo_oficina');
     }
 }

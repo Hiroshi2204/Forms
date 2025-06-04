@@ -5,20 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TipoDocDetalle extends Model
+class Oficina extends Model
 {
-    use HasFactory;
-    protected $table = 'tipo_doc_detalle';
+     use HasFactory;
+    protected $table = 'oficina';
     protected $fillable = array(
                             'nombre',
-                            'tipo_doc_id',
-                            'estado_registro'
+                            'cargo_oficina_id'
                         );
     protected $primaryKey = 'id';
     protected $hidden = [
         'created_at', 'updated_at','deleted_at'
     ];
-    public function tipo_doc(){
-        return $this->belongsTo(TipoDoc::class,'tipo_doc_id','id');
+    public function cargo_oficina(){
+        return $this->belongsTo(CargoOficina::class,'cargo_oficina_id','id');
     }
 }

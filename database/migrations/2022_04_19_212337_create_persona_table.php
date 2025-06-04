@@ -21,7 +21,6 @@ class CreatePersonaTable extends Migration
             $table->string('apellido_materno')->nullable();
             $table->string('celular')->nullable();
             $table->string('correo')->nullable();
-            $table->foreignId('tipo_documento_id')->nullable()->references('id')->on('tipo_documento');
             $table->string('direccion')->nullable();
             $table->timestamps();
         });

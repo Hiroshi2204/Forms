@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AlmacenProducto;
 use App\Models\Destinatario;
+use App\Models\Documento;
 use App\Models\EgresosAdicionales;
 use App\Models\Formulario;
 use App\Models\Persona;
@@ -41,19 +42,13 @@ class LoginController extends Controller
             //return response()->json(["error" => "El nombre de usuario no existe"], 400);
         }
 
-        $user = User::with('persona')->where('id', $username)->where('estado_registro', 'A')->first();
+        $user = User::with('oficina')->where('id', $username)->where('estado_registro', 'A')->first();
 
         if (!$user) {
             return redirect()->route('login');
             //return response()->json(['error' => 'Usuario bloqueado'], 402);
         }
         $response = [
-            "nombres" => $user->persona->nombres,
-            "apellido_paterno" => $user->persona->apellido_paterno,
-            "apellido_materno" => $user->persona->apellido_materno,
-            "username" => $user->username,
-            "celular" => $user->persona->celular,
-            "correo" => $user->persona->correo,
             "id" => $user->id
         ];
         return view('formulario_transparencia', $response);
@@ -61,6 +56,7 @@ class LoginController extends Controller
     public function store(Request $request, $id)
     {
         DB::beginTransaction();
+        
         try {
             $request->validate([
                 'pdf' => 'required|file|mimes:pdf|max:10240',
@@ -75,16 +71,21 @@ class LoginController extends Controller
                 // Captura el nombre original del archivo
                 $nombreOriginal = $archivo->getClientOriginalName();
 
-                $numDocumentoCompleto = $request->num_documento . '-' . $request->anio;
+                $user = User::with('oficina')->where('id', $id)->first();
 
                 // Guardar en base de datos incluyendo el nombre original
-                $formulario = Formulario::create([
-                    'num_documento' => $numDocumentoCompleto,
+                $formulario = Documento::create([
+                    'nombre' => $request->nombre,
+                    'numero' => $request->numero,
+                    'anio' => $request->anio,
                     'asunto' => $request->asunto,
-                    'fecha_registro' => $request->fecha_registro,
-                    'fecha_publicacion' => $request->fecha_publicacion,
+                    'resumen' => $request->resumen,
+                    'fecha_doc' => $request->fecha_doc,
+                    'fecha_envio' => now(),
+                    'oficina_remitente' => $user->oficina->nombre,
+                    'clase_documento_id' => $request->clase_documento_id,
                     'pdf_path' => $pdfPath,
-                    'nombre_original' => $nombreOriginal
+                    'nombre_original_pdf' => $nombreOriginal
                 ]);
 
                 DB::commit();
@@ -99,9 +100,13 @@ class LoginController extends Controller
     {
         $q = $request->input('q');
 
-        $resultados = Formulario::where('num_documento', 'like', "%$q%")
+        $resultados = Documento::where('nombre', 'like', "%$q%")
+            ->orWhere('numero', 'like', "%$q%")
             ->orWhere('asunto', 'like', "%$q%")
-            ->orWhere('nombre_original', 'like', "%$q%")
+            ->orWhere('resumen', 'like', "%$q%")
+            ->orWhere('fecha_doc', 'like', "%$q%")
+            ->orWhere('oficina_remitente', 'like', "%$q%")
+            ->orWhere('nombre_original_pdf', 'like', "%$q%")
             ->get();
 
         return response()->json($resultados);

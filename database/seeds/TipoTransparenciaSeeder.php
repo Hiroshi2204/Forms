@@ -2,10 +2,10 @@
 
 // namespace Database\Seeders;
 
-use App\Models\TipoDoc;
+use App\Models\TipoTransparencia;
 use Illuminate\Database\Seeder;
 
-class TipoDocSeeder extends Seeder
+class TipoTransparenciaSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,43 +14,43 @@ class TipoDocSeeder extends Seeder
      */
     public function run()
     {
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"FACULTADES"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"SECRETARIA GENERAL"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"UNIDAD DE GRADOS Y TITULOS"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"TRIBUNAL DE HONOR"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"COMISIÓN PERMANENTE DE FISCALIZACIÓN"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"COMITÉ ELECTORAL UNIVERSITARIO"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"ESCUELA DE POSGRADO"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"VICERECTORADO DE INVESTIGACIÓN (VRI)"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"VICERECTORADO ACADÉMICO (VRA)"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"DEFENSORÍA UNIVERSITARIA (ODU)"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"UNIDAD DE CONTABILIDAD"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"UNIDAD EJECUTORA DE INVERSIONES"
         ]);
-        TipoDoc::firstOrcreate([
+        TipoTransparencia::firstOrcreate([
             "nombre"=>"OFICINA DE PLANEAMIENTO Y PRESUPUESTO"
         ]);
     }

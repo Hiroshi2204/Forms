@@ -23,10 +23,4 @@ class Persona extends Model
     protected $hidden = [
         'created_at', 'updated_at','deleted_at'
     ];
-    public function tipo_documento(){
-        return $this->belongsTo(TipoDocumento::class,'tipo_documento_id','id');
-    }
-    public function rol(){
-        return $this->belongsTo(Rol::class,'rol_id','id');
-    }
 }

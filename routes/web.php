@@ -34,7 +34,7 @@ Route::post('/formulario/{id}', [LoginController::class, 'store']);
 
 Route::group(['middleware' => ['cors']], function () {
 
-    Route::get('/buscar', [FormularioController::class, 'buscar'])->name('resolucion.buscar');
+    Route::get('/buscar', [LoginController::class, 'buscar'])->name('resolucion.buscar');
 });
 Route::middleware(['web'])->group(function () {
     // Rutas aquí

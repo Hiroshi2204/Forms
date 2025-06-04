@@ -65,13 +65,20 @@
         <h4 class="card-title mb-4 mt-1">Subir Resolución</h4>
 
         <div class="form-group">
-          <label for="num_documento">Número de Resolución</label>
-          <input name="num_documento" class="form-control" placeholder="numero" type="text" required>
+          <label for="numero">Número de Resolución</label>
+          <input name="numero" class="form-control" placeholder="número" type="number" required>
         </div>
+
         <div class="form-group">
           <label for="anio">Año de Resolución</label>
-          <input name="anio" class="form-control" placeholder="año" type="text" required>
+          <input name="anio" class="form-control" placeholder="número" type="number" required>
         </div>
+
+        <div class="form-group">
+          <label for="nombre">Nombre de Resolución</label>
+          <input name="nombre" class="form-control" placeholder="nombre" type="text" required>
+        </div>
+        
 
         <div class="form-group">
           <label for="asunto">Asunto</label>
@@ -79,13 +86,18 @@
         </div>
 
         <div class="form-group">
-          <label for="fecha_registro">Fecha de registro</label>
-          <input name="fecha_registro" class="form-control" type="date" required>
+          <label for="resumen">Resumen</label>
+          <input name="resumen" class="form-control" placeholder="resumen" type="text" required>
         </div>
 
         <div class="form-group">
-          <label for="fecha_publicacion">Fecha de publicación</label>
-          <input name="fecha_publicacion" class="form-control" type="date" required>
+          <label for="fecha_doc">Fecha de publicación</label>
+          <input name="fecha_doc" class="form-control" type="date" required>
+        </div>
+
+        <div class="form-group">
+          <label for="clase_documento_id">Tipo de Documento</label>
+          <input name="clase_documento_id" class="form-control" placeholder="tipo de documento" type="number" required>
         </div>
 
         <div class="form-group">
@@ -140,11 +152,12 @@
             html = '<p>No se encontraron resultados.</p>';
           } else {
             data.forEach(function(item) {
-              html += `<div class="card mb-1" style="padding: 8px; font-size: 0.85rem; width: 300px;">
+              html += `<div class="card mb-1" style="padding: 8px; font-size: 0.85rem; width: 337px;">
                                 <div class="card-body py-2 px-3" style="padding: 10px;">
-                                <h6 style="margin-bottom: 4px; font-size: 0.9rem;">${item.num_documento} - ${item.asunto}</h6>
-                                <p style="margin-bottom: 6px; font-size: 0.75rem;">Archivo: ${item.nombre_original}</p>
-                                <a href="/storage/app/public/pdfs/${item.pdfPath}" target="_blank" style="font-size: 0.8rem;">Ver PDF</a>
+                                <h6 style="margin-bottom: 4px; font-size: 0.9rem;">${item.numero}-${item.fecha_doc} ${item.nombre}</h6>
+                                <h6 style="margin-bottom: 4px; font-size: 0.9rem;">${item.asunto}</h6>
+                                <p style="margin-bottom: 6px; font-size: 0.75rem;">Archivo: ${item.nombre_original_pdf}</p>
+                                <a href="/storage/${item.pdf_path}" target="_blank" style="font-size: 0.8rem;">Ver PDF</a>
                             </div>
                     </div>`;
             });
