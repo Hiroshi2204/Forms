@@ -16,18 +16,6 @@ class FormularioController extends Controller
         DB::beginTransaction();
 
         try {
-            // $request->validate([
-            //     'pdf' => 'required|file|mimes:pdf|max:10240',
-            //     'nombre' => 'required|string',
-            //     'numero' => 'required|string',
-            //     'anio' => 'required|integer',
-            //     'asunto' => 'required|string',
-            //     'resumen' => 'required|string',
-            //     'fecha_doc' => 'required|date',
-            //     'clase_documento_id' => 'required|integer'
-            // ]);
-
-
             if ($request->hasFile('pdf')) {
                 $archivo = $request->file('pdf');
                 $pdfPath = $archivo->store('pdfs', 'public');
@@ -51,6 +39,9 @@ class FormularioController extends Controller
                     'pdf_path' => $pdfPath,
                     'nombre_original_pdf' => $nombreOriginal
                 ]);
+
+                if ($formulario->clase_documento->oficina_id != $user->id)
+                    return response()->json(['error' => 'El usuario no tiene accesos'], 400);
                 DB::commit();
                 $formulario->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
                 return response()->json([
@@ -68,7 +59,6 @@ class FormularioController extends Controller
     public function buscar(Request $request)
     {
         $q = $request->input('q');
-        
 
         $resultados = Documento::where('nombre', 'like', "%$q%")
             ->orWhere('numero', 'like', "%$q%")
@@ -78,9 +68,9 @@ class FormularioController extends Controller
             ->orWhere('oficina_remitente', 'like', "%$q%")
             ->orWhere('nombre_original_pdf', 'like', "%$q%")
             ->get();
-            $resultados->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
-            return response()->json([
-                'documento' => $resultados
-            ]);
+        $resultados->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
+        return response()->json([
+            'documento' => $resultados
+        ]);
     }
 }

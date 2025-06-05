@@ -20,7 +20,7 @@ class CreateDocumentoTable extends Migration
             $table->string('anio')->nullable();
             $table->string('asunto')->nullable();
             $table->string('resumen')->nullable();
-            $table->integer('fecha_doc')->nullable();
+            $table->date('fecha_doc')->nullable();
             $table->date('fecha_envio')->nullable();
             $table->string('oficina_remitente')->nullable();
             $table->foreignId('clase_documento_id')->nullable()->references('id')->on('clase_documento');
