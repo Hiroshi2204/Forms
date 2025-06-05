@@ -60,17 +60,19 @@ class FormularioController extends Controller
     {
         $q = $request->input('q');
 
-        $resultados = Documento::where('nombre', 'like', "%$q%")
+        $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+            ->where('nombre', 'like', "%$q%")
             ->orWhere('numero', 'like', "%$q%")
             ->orWhere('asunto', 'like', "%$q%")
             ->orWhere('resumen', 'like', "%$q%")
             ->orWhere('fecha_doc', 'like', "%$q%")
             ->orWhere('oficina_remitente', 'like', "%$q%")
             ->orWhere('nombre_original_pdf', 'like', "%$q%")
-            ->get();
-        $resultados->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
+            ->paginate(10);  // paginar de a 10 resultados
+            
+
         return response()->json([
-            'documento' => $resultados
+            $resultados
         ]);
     }
 
