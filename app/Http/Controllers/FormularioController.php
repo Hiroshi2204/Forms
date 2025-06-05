@@ -73,4 +73,19 @@ class FormularioController extends Controller
             'documento' => $resultados
         ]);
     }
+
+    public function get()
+    {
+        DB::beginTransaction();
+        try {
+            $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')->get();
+
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
 }

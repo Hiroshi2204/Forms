@@ -26,7 +26,9 @@ Route::group(['middleware' => ['cors']], function () {
 
 Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
     Route::post('documentos', [FormularioController::class, 'store']);
-    Route::get('documentos/buscar/{id}', [FormularioController::class, 'buscar']);
+    Route::get('documentos/buscar', [FormularioController::class, 'buscar']);
+
+    Route::get('documentos/get', [FormularioController::class, 'get']);
 
     // Actualizar contraseña
     Route::put('password/update', 'AuthController@updatePassword');
