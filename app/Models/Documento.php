@@ -13,6 +13,7 @@ class Documento extends Model
         'nombre',
         'numero',
         'anio',
+        'num_anio',
         'asunto',
         'resumen',
         'fecha_doc',

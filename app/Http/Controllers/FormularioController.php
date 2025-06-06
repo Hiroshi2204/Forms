@@ -26,11 +26,13 @@ class FormularioController extends Controller
                 if (!$user || !$user->oficina) {
                     return response()->json(['error' => 'Usuario o oficina no encontrada'], 403);
                 }
+                $nomenclatura = ClaseDocumento::where('id',$request->clase_documento_id)->value('nomenclatura');
 
                 $formulario = Documento::create([
                     'nombre' => $request->nombre,
                     'numero' => $request->numero,
                     'anio' => $request->anio,
+                    'num_anio' => $request->numero . "-" . $request->anio . "-" . $nomenclatura,
                     'asunto' => $request->asunto,
                     'resumen' => $request->resumen,
                     'fecha_doc' => $request->fecha_doc,
