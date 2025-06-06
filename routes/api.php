@@ -33,6 +33,8 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
 
     Route::post('documentos/eliminar', [FormularioController::class, 'eliminar']);
 
+    Route::post('/documentos/descargar', [FormularioController::class, 'descargarPdf']);
+
     // Actualizar contraseña
     Route::put('password/update', 'AuthController@updatePassword');
 

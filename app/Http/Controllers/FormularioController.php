@@ -8,6 +8,7 @@ use App\Models\TipoTransparenciaDetalle;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class FormularioController extends Controller
 {
@@ -139,6 +140,31 @@ class FormularioController extends Controller
             DB::rollback();
             return response()->json([
                 'error' => 'No se pudo cambiar el estado: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function descargarPdf(Request $request)
+    {
+        try {
+            $id = $request->input('id');
+            $documento = Documento::find($id);
+
+            if (!$documento || !$documento->pdf_path) {
+                return response()->json(['error' => 'Documento o archivo no encontrado'], 404);
+            }
+
+            // Ruta completa al archivo en el disco 'public'
+            $filePath = storage_path('app/public/' . $documento->pdf_path);
+
+            if (!file_exists($filePath)) {
+                return response()->json(['error' => 'Archivo no encontrado en el servidor'], 404);
+            }
+
+            return response()->download($filePath, $documento->nombre_original_pdf);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'No se pudo descargar el archivo: ' . $e->getMessage()
             ], 500);
         }
     }
