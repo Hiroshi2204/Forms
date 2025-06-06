@@ -90,4 +90,24 @@ class FormularioController extends Controller
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
+
+    public function get_id()
+    {
+        $user = auth()->user();
+        DB::beginTransaction();
+        //return response()->json($user->id);
+        try {
+            $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')
+            ->where('oficina_id',$user->id)
+            ->get();
+
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+        
+    }
 }
