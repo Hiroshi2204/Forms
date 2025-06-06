@@ -56,25 +56,31 @@ class FormularioController extends Controller
             return response()->json(["error" => "Error al crear el registro: " . $e->getMessage()], 500);
         }
     }
+
+
     public function buscar(Request $request)
     {
-        $q = $request->input('q');
+        try {
+            $q = $request->input('q');
 
-        $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
-            ->where('nombre', 'like', "%$q%")
-            ->orWhere('numero', 'like', "%$q%")
-            ->orWhere('asunto', 'like', "%$q%")
-            ->orWhere('resumen', 'like', "%$q%")
-            ->orWhere('fecha_doc', 'like', "%$q%")
-            ->orWhere('oficina_remitente', 'like', "%$q%")
-            ->orWhere('nombre_original_pdf', 'like', "%$q%")
-            ->paginate(10);  // paginar de a 10 resultados
-            
-
-        return response()->json([
-            $resultados
-        ]);
+            $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+                ->where('estado_registro', 'A')
+                ->where(function ($query) use ($q) {
+                    $query->where('nombre', 'like', "%$q%")
+                        ->orWhere('numero', 'like', "%$q%")
+                        ->orWhere('asunto', 'like', "%$q%")
+                        ->orWhere('resumen', 'like', "%$q%")
+                        ->orWhere('fecha_doc', 'like', "%$q%")
+                        ->orWhere('oficina_remitente', 'like', "%$q%")
+                        ->orWhere('nombre_original_pdf', 'like', "%$q%");
+                })
+                ->paginate(10);
+            return response()->json($resultados);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
     }
+
 
     public function get()
     {
@@ -98,8 +104,8 @@ class FormularioController extends Controller
         //return response()->json($user->id);
         try {
             $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')
-            ->where('oficina_id',$user->id)
-            ->get();
+                ->where('oficina_id', $user->id)
+                ->get();
 
             return response()->json([
                 'documentos' => $resultados
@@ -108,6 +114,32 @@ class FormularioController extends Controller
             DB::rollback();
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
-        
+    }
+
+    public function eliminar(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $id = $request->input('id');
+            $documento = Documento::find($id);
+
+            if (!$documento) {
+                return response()->json(['error' => 'Documento no encontrado'], 404);
+            }
+
+            $documento->estado_registro = "I";
+            $documento->save();
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Estado actualizado correctamente',
+                'documento' => $documento
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'error' => 'No se pudo cambiar el estado: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
