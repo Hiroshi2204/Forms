@@ -17,48 +17,64 @@ class FormularioController extends Controller
         DB::beginTransaction();
 
         try {
-            if ($request->hasFile('pdf')) {
-                $archivo = $request->file('pdf');
-                $pdfPath = $archivo->store('pdfs', 'public');
-                $nombreOriginal = $archivo->getClientOriginalName();
-
-                $user = auth()->user();
-                if (!$user || !$user->oficina) {
-                    return response()->json(['error' => 'Usuario o oficina no encontrada'], 403);
-                }
-                $nomenclatura = ClaseDocumento::where('id',$request->clase_documento_id)->value('nomenclatura');
-
-                $formulario = Documento::create([
-                    'nombre' => $request->nombre,
-                    'numero' => $request->numero,
-                    'anio' => $request->anio,
-                    'num_anio' => $request->numero . "-" . $request->anio . "-" . $nomenclatura,
-                    'asunto' => $request->asunto,
-                    'resumen' => $request->resumen,
-                    'fecha_doc' => $request->fecha_doc,
-                    'fecha_envio' => now(),
-                    'oficina_remitente' => $user->oficina->nombre,
-                    'clase_documento_id' => $request->clase_documento_id,
-                    'pdf_path' => $pdfPath,
-                    'nombre_original_pdf' => $nombreOriginal
-                ]);
-
-                if ($formulario->clase_documento->oficina_id != $user->id)
-                    return response()->json(['error' => 'El usuario no tiene accesos'], 400);
-                DB::commit();
-                $formulario->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
-                return response()->json([
-                    'message' => 'Documento creado exitosamente',
-                    'documento' => $formulario
-                ], 201);
-            } else {
+            if (!$request->hasFile('pdf')) {
                 return response()->json(['error' => 'Archivo PDF no enviado'], 400);
             }
+
+            $archivo = $request->file('pdf');
+            $pdfPath = $archivo->store('pdfs', 'public');
+            $nombreOriginal = $archivo->getClientOriginalName();
+
+            $user = auth()->user();
+            if (!$user || !$user->oficina) {
+                return response()->json(['error' => 'Usuario o oficina no encontrada'], 403);
+            }
+
+            $nomenclatura = ClaseDocumento::where('id', $request->clase_documento_id)->value('nomenclatura');
+            $numAnio = $request->numero . "-" . $request->anio . "-" . $nomenclatura;
+
+            $existe = Documento::where('num_anio', $numAnio)
+                ->where('estado_registro', 'A')
+                ->exists();
+
+            if ($existe) {
+                return response()->json(['error' => 'Ya existe un documento activo con el mismo número, año y nomenclatura'], 409);
+            }
+
+            $formulario = Documento::create([
+                'nombre' => $request->nombre,
+                'numero' => $request->numero,
+                'anio' => $request->anio,
+                'num_anio' => $numAnio,
+                'asunto' => $request->asunto,
+                'resumen' => $request->resumen,
+                'fecha_doc' => $request->fecha_doc,
+                'fecha_envio' => now(),
+                'oficina_remitente' => $user->oficina->nombre,
+                'clase_documento_id' => $request->clase_documento_id,
+                'pdf_path' => $pdfPath,
+                'nombre_original_pdf' => $nombreOriginal,
+                'estado_registro' => 'A' // Asegúrate de establecerlo explícitamente si aplica
+            ]);
+
+            if ($formulario->clase_documento->oficina_id != $user->id) {
+                return response()->json(['error' => 'El usuario no tiene accesos'], 400);
+            }
+
+            DB::commit();
+
+            $formulario->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
+
+            return response()->json([
+                'message' => 'Documento creado exitosamente',
+                'documento' => $formulario
+            ], 201);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(["error" => "Error al crear el registro: " . $e->getMessage()], 500);
         }
     }
+
 
 
     public function buscar(Request $request)
@@ -168,6 +184,32 @@ class FormularioController extends Controller
             return response()->json([
                 'error' => 'No se pudo descargar el archivo: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function filtro()
+    {
+        $user = auth()->user();
+        DB::beginTransaction();
+
+        try {
+            $anioActual = date('Y');
+
+            // Obtener solo los `num_anio` de documentos del año actual
+            $resultados = Documento::select('num_anio')
+                ->where('anio', $anioActual)
+                ->where('estado_registro', 'A') // opcional: si quieres solo los activos
+                ->distinct()
+                ->get();
+
+            DB::commit();
+
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
 }

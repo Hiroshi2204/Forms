@@ -35,6 +35,8 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
 
     Route::post('/documentos/descargar', [FormularioController::class, 'descargarPdf']);
 
+    Route::get('documentos/get/anio', [FormularioController::class, 'filtro']);
+
     // Actualizar contraseña
     Route::put('password/update', 'AuthController@updatePassword');
 

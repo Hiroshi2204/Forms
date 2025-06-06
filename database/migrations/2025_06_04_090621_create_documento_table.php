@@ -18,9 +18,9 @@ class CreateDocumentoTable extends Migration
             $table->string('nombre')->nullable();
             $table->string('numero')->nullable();
             $table->string('anio')->nullable();
-            $table->string('num_anio')->unique();
+            $table->string('num_anio')->nullable();
             $table->string('asunto')->nullable();
-            $table->string('resumen')->nullable();
+            $table->longText('resumen')->nullable();
             $table->date('fecha_doc')->nullable();
             $table->date('fecha_envio')->nullable();
             $table->string('oficina_remitente')->nullable();
