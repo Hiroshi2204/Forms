@@ -13,6 +13,7 @@ class Documento extends Model
         'nombre',
         'numero',
         'anio',
+        'num_anio',
         'asunto',
         'resumen',
         'fecha_doc',
@@ -20,7 +21,8 @@ class Documento extends Model
         'oficina_remitente',
         'clase_documento_id',
         'pdf_path',
-        'nombre_original_pdf'
+        'nombre_original_pdf',
+        'estado_registro'
     );
     protected $primaryKey = 'id';
     protected $hidden = [
