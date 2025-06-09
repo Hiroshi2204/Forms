@@ -31,9 +31,12 @@ class FormularioController extends Controller
             }
 
             $nomenclatura = ClaseDocumento::where('id', $request->clase_documento_id)->value('nomenclatura');
-            $numAnio = $request->numero . "-" . $request->anio . "-" . $nomenclatura;
+            $numeroLimpio = ltrim($request->numero, '0');
+            $numeroFormateado = str_pad($numeroLimpio, 3, '0', STR_PAD_LEFT);
+            $numeroLimpio = $numeroFormateado . "-" . $request->anio . "-" . $nomenclatura;
 
-            $existe = Documento::where('num_anio', $numAnio)
+
+            $existe = Documento::where('num_anio', $numeroLimpio)
                 ->where('estado_registro', 'A')
                 ->exists();
 
@@ -43,9 +46,9 @@ class FormularioController extends Controller
 
             $formulario = Documento::create([
                 'nombre' => $request->nombre,
-                'numero' => $request->numero,
+                'numero' => $numeroFormateado,
                 'anio' => $request->anio,
-                'num_anio' => $numAnio,
+                'num_anio' => $numeroLimpio,
                 'asunto' => $request->asunto,
                 'resumen' => $request->resumen,
                 'fecha_doc' => $request->fecha_doc,
