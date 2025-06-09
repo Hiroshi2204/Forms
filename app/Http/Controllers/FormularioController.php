@@ -95,8 +95,8 @@ class FormularioController extends Controller
             $nomenclatura = ClaseDocumento::where('id', $request->clase_documento_id)->value('nomenclatura');
             $numeroLimpio = ltrim($request->numero, '0');
             $numeroFormateado = str_pad($numeroLimpio, 4, '0', STR_PAD_LEFT);
-            //$numeroLimpio = $numeroFormateado . "-" . now()->format('Y') . "-" . $nomenclatura;
-            $numeroLimpio = $numeroFormateado . "-" . $request->anio . "-" . $nomenclatura;
+            $numeroLimpio = $numeroFormateado . "-" . now()->format('Y') . "-" . $nomenclatura;
+            //$numeroLimpio = $numeroFormateado . "-" . $request->anio . "-" . $nomenclatura;
 
 
             $existe = Documento::where('num_anio', $numeroLimpio)
@@ -108,13 +108,13 @@ class FormularioController extends Controller
             }
 
             $formulario = Documento::create([
-                'nombre' => $request->nombre,
+                'nombre' => mb_strtoupper($request->nombre, 'UTF-8'),
                 'numero' => $numeroFormateado,
-                //'anio' => now()->format('Y'),
+                'anio' => now()->format('Y'),
                 'anio' => $request->anio,
                 'num_anio' => $numeroLimpio,
-                'asunto' => $request->asunto,
-                'resumen' => $request->resumen,
+                'asunto' => mb_strtoupper($request->asunto, 'UTF-8'),
+                'resumen' => mb_strtoupper($request->resumen, 'UTF-8'),
                 'fecha_doc' => $request->fecha_doc,
                 'fecha_envio' => now(),
                 'oficina_remitente' => $user->oficina->nombre,
