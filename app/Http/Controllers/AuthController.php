@@ -28,7 +28,7 @@ class AuthController extends Controller
         if (!$usernameu) /*return redirect()->route('login');*/
             return response()->json(["error" => "El nombre de usuario no existe"], 400);
 
-        $user = User::with('oficina')->where('username', $request->username)->where('estado_registro', 'A')->first();
+        $user = User::with('oficina')->with('rol')->where('username', $request->username)->where('estado_registro', 'A')->first();
 
         if (!$user) /*return redirect()->route('login');*/
             return response()->json(['error' => 'Usuario bloqueado'], 402);
@@ -46,10 +46,11 @@ class AuthController extends Controller
         session(['username' => $username]);
         $response = array(
             "id" => $user->id,
-            "oficina_id" => $user->oficina_id,
             "username" => $user->username,
+            "oficina_id" => $user->oficina_id,
             "oficina" => $user->oficina,
-            "rol_id" => $user->rol,
+            "rol_id" => $user->rol_id,
+            "rol" => $user->rol,
         );
         $response['token'] = $token;
         //return redirect()->intended("/formulario/{$user->id}");
