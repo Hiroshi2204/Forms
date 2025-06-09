@@ -113,7 +113,7 @@ class FormularioController extends Controller
                 'nombre' => mb_strtoupper($request->nombre, 'UTF-8'),
                 'numero' => $numeroFormateado,
                 'anio' => now()->format('Y'),
-                'anio' => $request->anio,
+                //'anio' => $request->anio,
                 'num_anio' => $numeroLimpio,
                 'asunto' => mb_strtoupper($request->asunto, 'UTF-8'),
                 'resumen' => mb_strtoupper($request->resumen, 'UTF-8'),
