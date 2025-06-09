@@ -437,17 +437,19 @@ class FormularioController extends Controller
      * )
      */
 
-    public function filtro()
+    public function filtro(Request $request)
     {
         $user = auth()->user();
         DB::beginTransaction();
 
         try {
+            $nomenclatura = ClaseDocumento::where('id', $request->clase_documento_id)->value('id');
             $anioActual = date('Y');
             //$oficina = ClaseDocumento::where('oficina_id', $user->oficina_id);
             $resultados = Documento::select('num_anio')
                 ->where('anio', $anioActual)
                 ->where('oficina_remitente', $user->oficina->nombre)
+                ->where('clase_documento_id', $nomenclatura)
                 ->where('estado_registro', 'A')
                 ->distinct()
                 ->get();
