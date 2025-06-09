@@ -271,11 +271,19 @@ class FormularioController extends Controller
     {
         $user = auth()->user();
         DB::beginTransaction();
-        //return response()->json($user->id);
+
         try {
-            $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')
-                ->where('oficina_id', $user->id)
-                ->get();
+            if ($user->rol_id === 1) {
+                // Admin: ver todos
+                $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')->get();
+            } else {
+                // Usuario: solo los de su oficina
+                $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')
+                    ->where('oficina_id', $user->oficina_id)
+                    ->get();
+            }
+
+            DB::commit();
 
             return response()->json([
                 'documentos' => $resultados
@@ -285,6 +293,7 @@ class FormularioController extends Controller
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
+
 
 
     /**
