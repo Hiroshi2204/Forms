@@ -195,6 +195,90 @@ class FormularioController extends Controller
     }
 
 
+    public function buscar_nombre(Request $request)
+    {
+        try {
+            $q = $request->input('q');
+
+            $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+                ->where('estado_registro', 'A')
+                ->where(function ($query) use ($q) {
+                    $query->where('nombre', 'like', "%$q%");
+                })
+                ->paginate(10);
+            return response()->json($resultados);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+
+    public function buscar_numero(Request $request)
+    {
+        try {
+            $q = $request->input('q');
+
+            $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+                ->where('estado_registro', 'A')
+                ->where(function ($query) use ($q) {
+                    $query->where('numero', 'like', "%$q%");
+                })
+                ->paginate(10);
+            return response()->json($resultados);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+
+    public function buscar_asunto(Request $request)
+    {
+        try {
+            $q = $request->input('q');
+
+            $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+                ->where('estado_registro', 'A')
+                ->where(function ($query) use ($q) {
+                    $query->where('asunto', 'like', "%$q%");
+                })
+                ->paginate(10);
+            return response()->json($resultados);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+    public function buscar_resumen(Request $request)
+    {
+        try {
+            $q = $request->input('q');
+
+            $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+                ->where('estado_registro', 'A')
+                ->where(function ($query) use ($q) {
+                    $query->where('resumen', 'like', "%$q%");
+                })
+                ->paginate(10);
+            return response()->json($resultados);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+
+    public function buscar_fecha(Request $request)
+    {
+        try {
+            $q = $request->input('q');
+
+            $resultados = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+                ->where('estado_registro', 'A')
+                ->where(function ($query) use ($q) {
+                    $query->where('fecha_doc', 'like', "%$q%");
+                })
+                ->paginate(10);
+            return response()->json($resultados);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+
     /**
      * @OA\Get(
      *     path="/api/documentos/get",

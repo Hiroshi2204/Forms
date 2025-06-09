@@ -27,6 +27,11 @@ Route::group(['middleware' => ['cors']], function () {
 Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
     Route::post('documentos', [FormularioController::class, 'store']);
     Route::get('documentos/buscar', [FormularioController::class, 'buscar']);
+    Route::get('documentos/buscar/nombre', [FormularioController::class, 'buscar_nombre']);
+    Route::get('documentos/buscar/asunto', [FormularioController::class, 'buscar_asunto']);
+    Route::get('documentos/buscar/numero', [FormularioController::class, 'buscar_numero']);
+    Route::get('documentos/buscar/resumen', [FormularioController::class, 'buscar_resumen']);
+    Route::get('documentos/buscar/fecha', [FormularioController::class, 'buscar_fecha']);
 
     Route::get('documentos/get', [FormularioController::class, 'get']);
     Route::get('documentos/get_id', [FormularioController::class, 'get_id']);
