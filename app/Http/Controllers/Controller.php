@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 
 /**
  * @OA\Info(
- *    title="APIs For Bregma",
+ *    title="APIs FOR UNAC",
  *    version="1.0.0",
  * ),
  *   @OA\SecurityScheme(

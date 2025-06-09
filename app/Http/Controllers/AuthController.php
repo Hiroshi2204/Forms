@@ -18,6 +18,54 @@ class AuthController extends Controller
     {
         return view('mostrar_login');
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Autenticación de usuario",
+     *     description="Autentica a un usuario con nombre de usuario y contraseña, y devuelve un token JWT.",
+     *     operationId="autenticarUsuario",
+     *     tags={"Autenticación"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"username", "password"},
+     *             @OA\Property(property="username", type="string", example="admin"),
+     *             @OA\Property(property="password", type="string", example="admin123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Inicio de sesión exitoso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="username", type="string", example="usuario1"),
+     *             @OA\Property(property="oficina_id", type="integer", example=3),
+     *             @OA\Property(property="oficina", type="object"),
+     *             @OA\Property(property="rol_id", type="integer", example=2),
+     *             @OA\Property(property="rol", type="object"),
+     *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJh...")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Nombre de usuario no existe"
+     *     ),
+     *     @OA\Response(
+     *         response=402,
+     *         description="Usuario bloqueado"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Credenciales inválidas"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error al generar el token"
+     *     )
+     * )
+     */
+
     public function authenticate(Request $request)
     {
         //return response()->json($request);

@@ -12,6 +12,57 @@ use Illuminate\Support\Facades\Storage;
 
 class FormularioController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/documentos",
+     *     summary="Crear un nuevo documento",
+     *     description="Crea un documento con validación de rol y oficina, y sube un PDF.",
+     *     operationId="crearDocumento",
+     *     tags={"Documentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"pdf", "numero", "nombre", "asunto", "resumen", "fecha_doc", "clase_documento_id"},
+     *                 @OA\Property(property="pdf", type="file", description="Archivo PDF"),
+     *                 @OA\Property(property="numero", type="string", example="001"),
+     *                 @OA\Property(property="nombre", type="string", example="Documento ejemplo"),
+     *                 @OA\Property(property="asunto", type="string", example="Asunto del documento"),
+     *                 @OA\Property(property="resumen", type="string", example="Resumen del documento"),
+     *                 @OA\Property(property="fecha_doc", type="string", format="date", example="2025-06-09"),
+     *                 @OA\Property(property="clase_documento_id", type="integer", example=3)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Documento creado exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Documento creado exitosamente"),
+     *             @OA\Property(property="documento", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Archivo PDF no enviado o sin acceso"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Usuario o oficina no encontrada"
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="Documento duplicado"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error del servidor"
+     *     )
+     * )
+     */
+
     public function store(Request $request)
     {
         DB::beginTransaction();
@@ -35,9 +86,7 @@ class FormularioController extends Controller
                 return response()->json(['error' => 'Clase de documento no encontrada'], 404);
             }
 
-            // Si el usuario no tiene el rol administrador (rol_id = 1)
             if ($user->rol_id !== 1) {
-                // Verifica que la clase de documento pertenezca a su oficina
                 if ($claseDocumento->oficina_id !== $user->oficina_id) {
                     return response()->json(['error' => 'No tienes acceso a esta clase de documento'], 403);
                 }
@@ -45,7 +94,8 @@ class FormularioController extends Controller
 
             $nomenclatura = ClaseDocumento::where('id', $request->clase_documento_id)->value('nomenclatura');
             $numeroLimpio = ltrim($request->numero, '0');
-            $numeroFormateado = str_pad($numeroLimpio, 3, '0', STR_PAD_LEFT);
+            $numeroFormateado = str_pad($numeroLimpio, 4, '0', STR_PAD_LEFT);
+            //$numeroLimpio = $numeroFormateado . "-" . now()->format('Y') . "-" . $nomenclatura;
             $numeroLimpio = $numeroFormateado . "-" . $request->anio . "-" . $nomenclatura;
 
 
@@ -60,6 +110,7 @@ class FormularioController extends Controller
             $formulario = Documento::create([
                 'nombre' => $request->nombre,
                 'numero' => $numeroFormateado,
+                //'anio' => now()->format('Y'),
                 'anio' => $request->anio,
                 'num_anio' => $numeroLimpio,
                 'asunto' => $request->asunto,
@@ -70,13 +121,8 @@ class FormularioController extends Controller
                 'clase_documento_id' => $request->clase_documento_id,
                 'pdf_path' => $pdfPath,
                 'nombre_original_pdf' => $nombreOriginal,
-                'estado_registro' => 'A' // Asegúrate de establecerlo explícitamente si aplica
+                'estado_registro' => 'A'
             ]);
-
-            // if ($formulario->clase_documento->oficina_id != $user->id) {
-            //     return response()->json(['error' => 'El usuario no tiene accesos'], 400);
-            // }
-
             DB::commit();
 
             $formulario->load('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina');
@@ -92,6 +138,38 @@ class FormularioController extends Controller
     }
 
 
+    /**
+     * @OA\Get(
+     *     path="/api/documentos/buscar",
+     *     summary="Buscar documentos",
+     *     description="Busca documentos activos usando un término de búsqueda general en campos como nombre, número, asunto, resumen, fechas y más.",
+     *     operationId="buscarDocumentos",
+     *     tags={"Documentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         description="Término de búsqueda",
+     *         required=true,
+     *         @OA\Schema(type="string", example="resolución")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de documentos encontrados",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="current_page", type="integer", example=1),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="last_page", type="integer", example=5),
+     *             @OA\Property(property="per_page", type="integer", example=10),
+     *             @OA\Property(property="total", type="integer", example=50)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno al buscar documentos"
+     *     )
+     * )
+     */
 
     public function buscar(Request $request)
     {
@@ -117,6 +195,34 @@ class FormularioController extends Controller
     }
 
 
+    /**
+     * @OA\Get(
+     *     path="/api/documentos/get",
+     *     summary="Obtener clases de documentos",
+     *     description="Retorna una lista de clases de documentos con sus campos: id, nombre y nomenclatura.",
+     *     operationId="obtenerClasesDocumentos",
+     *     tags={"Documentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de clases de documentos",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="documentos", type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="nombre", type="string", example="Resolución"),
+     *                     @OA\Property(property="nomenclatura", type="string", example="RES")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno al obtener clases de documentos"
+     *     )
+     * )
+     */
+
     public function get()
     {
         DB::beginTransaction();
@@ -131,6 +237,35 @@ class FormularioController extends Controller
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
+
+
+    /**
+     * @OA\Get(
+     *     path="/api/documentos/get_id",
+     *     summary="Obtener clases de documentos por oficina",
+     *     description="Devuelve clases de documentos asignadas a la oficina del usuario autenticado.",
+     *     operationId="obtenerClasesDocumentosPorOficina",
+     *     tags={"Documentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de clases de documentos filtradas por oficina",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="documentos", type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=2),
+     *                     @OA\Property(property="nombre", type="string", example="Informe Técnico"),
+     *                     @OA\Property(property="nomenclatura", type="string", example="INF")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno al obtener clases de documentos"
+     *     )
+     * )
+     */
 
     public function get_id()
     {
@@ -150,6 +285,44 @@ class FormularioController extends Controller
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
+
+
+    /**
+     * @OA\Post(
+     *     path="/api/documentos/eliminar",
+     *     summary="Eliminar (inhabilitar) un documento",
+     *     description="Cambia el estado de un documento a 'I' (inhabilitado) por su ID.",
+     *     operationId="eliminarDocumento",
+     *     tags={"Documentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"id"},
+     *             @OA\Property(property="id", type="integer", example=12, description="ID del documento a inhabilitar")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Documento inhabilitado exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Estado actualizado correctamente"),
+     *             @OA\Property(property="documento", type="object",
+     *                 @OA\Property(property="id", type="integer", example=12),
+     *                 @OA\Property(property="estado_registro", type="string", example="I")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Documento no encontrado"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno al actualizar estado del documento"
+     *     )
+     * )
+     */
 
     public function eliminar(Request $request)
     {
@@ -178,6 +351,38 @@ class FormularioController extends Controller
         }
     }
 
+
+    /**
+     * @OA\Post(
+     *     path="/api/documentos/descargar",
+     *     summary="Descargar PDF de un documento",
+     *     description="Permite descargar el archivo PDF asociado a un documento usando su ID.",
+     *     operationId="descargarPdfDocumento",
+     *     tags={"Documentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"id"},
+     *             @OA\Property(property="id", type="integer", example=5, description="ID del documento que contiene el PDF")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Archivo PDF descargado exitosamente",
+     *         @OA\Schema(type="file")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Documento o archivo no encontrado"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error al descargar el archivo"
+     *     )
+     * )
+     */
+
     public function descargarPdf(Request $request)
     {
         try {
@@ -188,7 +393,6 @@ class FormularioController extends Controller
                 return response()->json(['error' => 'Documento o archivo no encontrado'], 404);
             }
 
-            // Ruta completa al archivo en el disco 'public'
             $filePath = storage_path('app/public/' . $documento->pdf_path);
 
             if (!file_exists($filePath)) {
@@ -203,6 +407,36 @@ class FormularioController extends Controller
         }
     }
 
+
+    /**
+     * @OA\Get(
+     *     path="/api/documentos/get/anio",
+     *     summary="Obtener lista de documentos únicos por año actual",
+     *     description="Devuelve una lista de valores únicos del campo 'num_anio' de los documentos activos del año actual.",
+     *     operationId="filtroDocumentos",
+     *     tags={"Documentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de documentos obtenida exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="documentos",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="num_anio", type="string", example="001-2025-OFI")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error al obtener las resoluciones"
+     *     )
+     * )
+     */
+
     public function filtro()
     {
         $user = auth()->user();
@@ -210,11 +444,11 @@ class FormularioController extends Controller
 
         try {
             $anioActual = date('Y');
-
-            // Obtener solo los `num_anio` de documentos del año actual
+            //$oficina = ClaseDocumento::where('oficina_id', $user->oficina_id);
             $resultados = Documento::select('num_anio')
                 ->where('anio', $anioActual)
-                ->where('estado_registro', 'A') // opcional: si quieres solo los activos
+                ->where('oficina_remitente', $user->oficina->nombre)
+                ->where('estado_registro', 'A')
                 ->distinct()
                 ->get();
 
