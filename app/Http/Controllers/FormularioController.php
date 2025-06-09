@@ -30,6 +30,19 @@ class FormularioController extends Controller
                 return response()->json(['error' => 'Usuario o oficina no encontrada'], 403);
             }
 
+            $claseDocumento = ClaseDocumento::with('oficina')->find($request->clase_documento_id);
+            if (!$claseDocumento) {
+                return response()->json(['error' => 'Clase de documento no encontrada'], 404);
+            }
+
+            // Si el usuario no tiene el rol administrador (rol_id = 1)
+            if ($user->rol_id !== 1) {
+                // Verifica que la clase de documento pertenezca a su oficina
+                if ($claseDocumento->oficina_id !== $user->oficina_id) {
+                    return response()->json(['error' => 'No tienes acceso a esta clase de documento'], 403);
+                }
+            }
+
             $nomenclatura = ClaseDocumento::where('id', $request->clase_documento_id)->value('nomenclatura');
             $numeroLimpio = ltrim($request->numero, '0');
             $numeroFormateado = str_pad($numeroLimpio, 3, '0', STR_PAD_LEFT);
@@ -60,9 +73,9 @@ class FormularioController extends Controller
                 'estado_registro' => 'A' // Asegúrate de establecerlo explícitamente si aplica
             ]);
 
-            if ($formulario->clase_documento->oficina_id != $user->id) {
-                return response()->json(['error' => 'El usuario no tiene accesos'], 400);
-            }
+            // if ($formulario->clase_documento->oficina_id != $user->id) {
+            //     return response()->json(['error' => 'El usuario no tiene accesos'], 400);
+            // }
 
             DB::commit();
 
