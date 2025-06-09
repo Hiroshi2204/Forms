@@ -4,6 +4,7 @@ namespace App;
 
 use App\Models\Oficina;
 use App\Models\Persona;
+use App\Models\Rol;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -51,5 +52,8 @@ class User extends Authenticatable implements JWTSubject
         }
         public function oficina(){
             return $this->belongsTo(Oficina::class,'oficina_id','id');
+        }
+        public function rol(){
+            return $this->belongsTo(Rol::class,'rol_id','id');
         }
 }

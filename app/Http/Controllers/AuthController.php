@@ -49,6 +49,7 @@ class AuthController extends Controller
             "oficina_id" => $user->oficina_id,
             "username" => $user->username,
             "oficina" => $user->oficina,
+            "rol_id" => $user->rol,
         );
         $response['token'] = $token;
         //return redirect()->intended("/formulario/{$user->id}");
