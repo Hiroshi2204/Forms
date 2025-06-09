@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ClaseDocumento;
 use App\Models\Documento;
+use App\Models\Oficina;
+use App\Models\TipoTransparencia;
 use App\Models\TipoTransparenciaDetalle;
 use App\User;
 use Illuminate\Http\Request;
@@ -220,8 +222,10 @@ class FormularioController extends Controller
                 $query->where('fecha_doc', 'like', '%' . $request->fecha_doc . '%');
             }
 
-            if ($request->filled('oficina_remitente')) {
-                $query->where('oficina_remitente', 'like', '%' . $request->oficina_remitente . '%');
+            if ($request->filled('oficina_id')) {
+                $query->whereHas('clase_documento.oficina', function ($q) use ($request) {
+                    $q->where('id', $request->oficina_id);
+                });
             }
 
             if ($request->filled('nombre_original_pdf')) {
@@ -355,6 +359,21 @@ class FormularioController extends Controller
         DB::beginTransaction();
         try {
             $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')->get();
+
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+
+    public function get_oficinas()
+    {
+        DB::beginTransaction();
+        try {
+            $resultados = TipoTransparencia::select('id', 'nombre')->get();
 
             return response()->json([
                 'documentos' => $resultados
