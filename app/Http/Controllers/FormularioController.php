@@ -194,6 +194,49 @@ class FormularioController extends Controller
         }
     }
 
+    public function buscar_parametro(Request $request)
+    {
+        try {
+            $query = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+                ->where('estado_registro', 'A');
+
+            if ($request->filled('nombre')) {
+                $query->where('nombre', 'like', '%' . $request->nombre . '%');
+            }
+
+            if ($request->filled('numero')) {
+                $query->where('numero', 'like', '%' . $request->numero . '%');
+            }
+
+            if ($request->filled('asunto')) {
+                $query->where('asunto', 'like', '%' . $request->asunto . '%');
+            }
+
+            if ($request->filled('resumen')) {
+                $query->where('resumen', 'like', '%' . $request->resumen . '%');
+            }
+
+            if ($request->filled('fecha_doc')) {
+                $query->where('fecha_doc', 'like', '%' . $request->fecha_doc . '%');
+            }
+
+            if ($request->filled('oficina_remitente')) {
+                $query->where('oficina_remitente', 'like', '%' . $request->oficina_remitente . '%');
+            }
+
+            if ($request->filled('nombre_original_pdf')) {
+                $query->where('nombre_original_pdf', 'like', '%' . $request->nombre_original_pdf . '%');
+            }
+
+            $resultados = $query->paginate(10);
+
+            return response()->json($resultados);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+
+
 
     public function buscar_nombre(Request $request)
     {
