@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ClaseDocumento;
 use App\Models\Documento;
 use App\Models\Oficina;
+use App\Models\OficinaDocumento;
 use App\Models\TipoTransparencia;
 use App\Models\TipoTransparenciaDetalle;
 use App\User;
@@ -199,7 +200,7 @@ class FormularioController extends Controller
     public function buscar_parametro(Request $request)
     {
         try {
-            $query = Documento::with('clase_documento.tipo_transparencia', 'clase_documento.oficina.cargo_oficina')
+            $query = Documento::with('clase_documento.tipo_transparencia', 'oficina')
                 ->where('estado_registro', 'A');
 
             if ($request->filled('nombre')) {
@@ -222,10 +223,18 @@ class FormularioController extends Controller
                 $query->where('fecha_doc', 'like', '%' . $request->fecha_doc . '%');
             }
 
+            // Oficina (relación anidada)
             if ($request->filled('oficina_id')) {
-                $query->whereHas('clase_documento.oficina', function ($q) use ($request) {
-                    $q->where('id', $request->oficina_id);
+                $query->whereHas('clase_documento', function ($q) use ($request) {
+                    $q->whereHas('oficina', function ($q2) use ($request) {
+                        $q2->where('id', $request->oficina_id);
+                    });
                 });
+            }
+
+            // Oficio (relación directa)
+            if ($request->filled('oficio_id')) {
+                $query->where('oficio_id', $request->oficio_id);  // Asumiendo que Documento tiene oficio_id como FK
             }
 
             if ($request->filled('nombre_original_pdf')) {
@@ -420,13 +429,14 @@ class FormularioController extends Controller
 
         try {
             if ($user->rol_id === 1) {
-                // Admin: ver todos
-                $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')->get();
+                // Admin: todas las clases de documento
+                $resultados = ClaseDocumento::all();
             } else {
-                // Usuario: solo los de su oficina
-                $resultados = ClaseDocumento::select('id', 'nombre', 'nomenclatura')
-                    ->where('oficina_id', $user->oficina_id)
-                    ->get();
+                // Usuario: clases según su oficina
+                $claseIds = OficinaDocumento::where('oficina_id', $user->oficina_id)
+                    ->pluck('clase_documento_id');
+
+                $resultados = ClaseDocumento::whereIn('id', $claseIds)->get();
             }
 
             DB::commit();
@@ -439,6 +449,7 @@ class FormularioController extends Controller
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
+
 
 
 
