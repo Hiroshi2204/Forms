@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Oficina extends Model
 {
-     use HasFactory;
+    use HasFactory;
     protected $table = 'oficina';
     protected $fillable = array(
                             'nombre',

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateClaseDocumentoTable extends Migration
+class CreateOficinaDocumentoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateClaseDocumentoTable extends Migration
      */
     public function up()
     {
-        Schema::create('clase_documento', function (Blueprint $table) {
+        Schema::create('oficina_documento', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->nullable();
-            $table->string('nomenclatura')->nullable();
-            $table->foreignId('tipo_transparencia_id')->nullable()->references('id')->on('tipo_transparencia');
+            $table->foreignId('oficina_id')->nullable()->references('id')->on('oficina');
+            $table->foreignId('clase_documento_id')->nullable()->references('id')->on('clase_documento');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateClaseDocumentoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('clase_documento');
+        Schema::dropIfExists('oficina_documento');
     }
 }

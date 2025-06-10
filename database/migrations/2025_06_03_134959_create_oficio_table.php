@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDocumentoTable extends Migration
+class CreateOficioTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,13 @@ class CreateDocumentoTable extends Migration
      */
     public function up()
     {
-        Schema::create('documento', function (Blueprint $table) {
+        Schema::create('oficio', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->nullable();
             $table->string('numero')->nullable();
-            $table->string('anio')->nullable();
-            $table->string('num_anio')->nullable();
-            $table->longText('resumen')->nullable();
-            $table->string('detalle')->nullable();
-            $table->date('fecha_doc')->nullable();
-            $table->date('fecha_envio')->nullable();
             $table->string('oficina_remitente')->nullable();
-            $table->foreignId('clase_documento_id')->nullable()->references('id')->on('clase_documento');
-            $table->foreignId('oficio_id')->nullable()->references('id')->on('oficio');
+            $table->string('codigo')->nullable();
+            $table->date('fecha_ofi')->nullable();
+            $table->date('fecha_envio')->nullable();
             $table->string('pdf_path')->nullable();
             $table->string('nombre_original_pdf')->nullable();
             $table->char('estado_registro')->default('A');
@@ -40,6 +34,6 @@ class CreateDocumentoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('documento');
+        Schema::dropIfExists('oficio');
     }
 }

@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
                 $this->call(TipoTransparenciaSeeder::class);
                 $this->call(TipoTransparenciaDetalleSeeder::class);
                 $this->call(ClaseDocumentoSeeder::class);
+                $this->call(OficinaDocumentoSeeder::class);
         }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\AntecedentesPersonalesController;
 use App\Http\Controllers\ClinicaLocalController;
 use App\Http\Controllers\Empresa\EmpresaPaqueteController;
 use App\Http\Controllers\FormularioController;
+use App\Http\Controllers\OficioController;
 use App\Models\Rol;
 
 /*
@@ -26,6 +27,7 @@ Route::group(['middleware' => ['cors']], function () {
 
 Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
     Route::post('documentos', [FormularioController::class, 'store']);
+    Route::post('documentos/oficio', [OficioController::class, 'store']);
     Route::get('documentos/buscar', [FormularioController::class, 'buscar']);
     Route::get('documentos/buscar/nombre', [FormularioController::class, 'buscar_nombre']);
     Route::get('documentos/buscar/asunto', [FormularioController::class, 'buscar_asunto']);
