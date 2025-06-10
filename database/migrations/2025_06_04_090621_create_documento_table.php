@@ -24,6 +24,7 @@ class CreateDocumentoTable extends Migration
             $table->date('fecha_doc')->nullable();
             $table->date('fecha_envio')->nullable();
             $table->string('oficina_remitente')->nullable();
+            $table->foreignId('oficina_id')->nullable()->references('id')->on('oficina');
             $table->foreignId('clase_documento_id')->nullable()->references('id')->on('clase_documento');
             $table->foreignId('oficio_id')->nullable()->references('id')->on('oficio');
             $table->string('pdf_path')->nullable();

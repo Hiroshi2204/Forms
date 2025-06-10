@@ -19,6 +19,7 @@ class Documento extends Model
                             'fecha_doc',
                             'fecha_envio',
                             'oficina_remitente',
+                            'oficina_id',
                             'clase_documento_id',
                             'oficio_id',
                             'pdf_path',

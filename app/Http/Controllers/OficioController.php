@@ -104,6 +104,7 @@ class OficioController extends Controller
                     'fecha_doc' => $docData['fecha_doc'],
                     'fecha_envio' => now(),
                     'oficina_remitente' => $user->oficina->nombre,
+                    'oficina_id' => $user->oficina_id,
                     'clase_documento_id' => $docData['clase_documento_id'],
                     'pdf_path' => $pdfPathDoc,
                     'nombre_original_pdf' => $nombreOriginalDoc,

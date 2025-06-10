@@ -200,7 +200,7 @@ class FormularioController extends Controller
     public function buscar_parametro(Request $request)
     {
         try {
-            $query = Documento::with('clase_documento.tipo_transparencia', 'oficina')
+            $query = Documento::with('clase_documento.tipo_transparencia', 'oficina', 'oficio')
                 ->where('estado_registro', 'A');
 
             if ($request->filled('nombre')) {
@@ -223,13 +223,8 @@ class FormularioController extends Controller
                 $query->where('fecha_doc', 'like', '%' . $request->fecha_doc . '%');
             }
 
-            // Oficina (relación anidada)
             if ($request->filled('oficina_id')) {
-                $query->whereHas('clase_documento', function ($q) use ($request) {
-                    $q->whereHas('oficina', function ($q2) use ($request) {
-                        $q2->where('id', $request->oficina_id);
-                    });
-                });
+                $query->where('oficina_id', 'like', '%' . $request->oficina_id . '%');
             }
 
             // Oficio (relación directa)
