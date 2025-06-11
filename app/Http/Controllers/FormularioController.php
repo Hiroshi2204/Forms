@@ -377,7 +377,9 @@ class FormularioController extends Controller
     {
         DB::beginTransaction();
         try {
-            $resultados = TipoTransparencia::select('id', 'nombre')->get();
+            $resultados = Oficina::select('id', 'nombre')
+            ->where('id', '<>', 1)
+            ->get();
 
             return response()->json([
                 'documentos' => $resultados
