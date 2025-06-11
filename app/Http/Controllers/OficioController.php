@@ -47,7 +47,7 @@ class OficioController extends Controller
 
             // Crear el oficio
             $oficio = Oficio::create([
-                'numero' => $request->numero_oficio,
+                'numero' => $numeroFormateadoO,
                 'fecha_ofi' => $request->fecha_ofi,
                 'oficina_remitente' => $user->oficina->nombre,
                 'codigo' => $numeroLimpioOO,
@@ -146,6 +146,35 @@ class OficioController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(["error" => "Error al crear el oficio y documentos: " . $e->getMessage()], 500);
+        }
+    }
+
+
+    public function filtro_oficio()
+    {
+        $user = auth()->user();
+        DB::beginTransaction();
+
+        try {
+            $codigo = Oficio::where('oficina_remitente', $user->oficina->nombre)->value('id');
+            //$anioActual = date('Y');
+            //$oficina = ClaseDocumento::where('oficina_id', $user->oficina_id);
+            $resultados = Oficio::select('codigo')
+                //->where('anio', $anioActual)
+                ->where('oficina_remitente', $user->oficina->nombre)
+                ->where('codigo', $codigo)
+                ->where('estado_registro', 'A')
+                ->distinct()
+                ->get();
+
+            DB::commit();
+
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
 }

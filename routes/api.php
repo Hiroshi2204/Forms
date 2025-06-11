@@ -27,14 +27,14 @@ Route::group(['middleware' => ['cors']], function () {
 
 Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
     Route::post('documentos', [FormularioController::class, 'store']);
-    Route::post('documentos/oficio', [OficioController::class, 'store']);
+    Route::post('documentos/creacion_oficios_documentos', [OficioController::class, 'store']);
     Route::get('documentos/buscar', [FormularioController::class, 'buscar']);
     Route::get('documentos/buscar/nombre', [FormularioController::class, 'buscar_nombre']);
     Route::get('documentos/buscar/asunto', [FormularioController::class, 'buscar_asunto']);
     Route::get('documentos/buscar/numero', [FormularioController::class, 'buscar_numero']);
     Route::get('documentos/buscar/resumen', [FormularioController::class, 'buscar_resumen']);
     Route::get('documentos/buscar/fecha', [FormularioController::class, 'buscar_fecha']);
-    Route::get('documentos/buscar/parametro', [FormularioController::class, 'buscar_parametro']);
+    Route::get('documentos/buscar/busqueda_documentos_parametros', [FormularioController::class, 'buscar_parametro']);
 
     Route::get('documentos/get', [FormularioController::class, 'get']);
     Route::get('documentos/get_oficinas', [FormularioController::class, 'get_oficinas']);
@@ -44,7 +44,8 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
 
     Route::post('/documentos/descargar', [FormularioController::class, 'descargarPdf']);
 
-    Route::get('documentos/get/anio', [FormularioController::class, 'filtro']);
+    Route::get('documentos/get/documentos', [FormularioController::class, 'filtro']);
+    Route::get('documentos/get/oficio', [OficioController::class, 'filtro_oficio']);
 
     // Actualizar contraseña
     Route::put('password/update', 'AuthController@updatePassword');
