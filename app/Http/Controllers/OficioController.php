@@ -8,6 +8,7 @@ use App\Models\OficinaDocumento;
 use App\Models\Oficio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class OficioController extends Controller
 {
@@ -65,18 +66,21 @@ class OficioController extends Controller
                     return response()->json(['error' => 'Clase de documento no encontrada: ' . $docData['clase_documento_id']], 404);
                 }
 
-                // Verificar acceso del usuario si no es admin
-                if ($user->rol_id !== 1 && $claseDocumento->oficina_id !== $user->oficina_id) {
-                    DB::rollback();
-                    return response()->json(['error' => 'No tienes acceso a la clase de documento ' . $docData['clase_documento_id']], 403);
-                }
-
                 $pdfPathDoc = null;
                 $nombreOriginalDoc = null;
+
                 if (isset($docData['pdf']) && $docData['pdf'] instanceof \Illuminate\Http\UploadedFile) {
                     $pdfDoc = $docData['pdf'];
-                    $pdfPathDoc = $pdfDoc->store('documentos', 'public');
                     $nombreOriginalDoc = $pdfDoc->getClientOriginalName();
+
+                    // Carpeta con fecha (opcional): documentos/2025/06/11
+                    $folder = 'documentos/' . now()->format('Y/m/d');
+
+                    // Nombre único para el archivo (usando timestamp + hash del nombre original)
+                    $filename = time() . '_' . md5($nombreOriginalDoc) . '.' . $pdfDoc->getClientOriginalExtension();
+
+                    // Guarda el archivo usando Storage (disco 'public')
+                    $pdfPathDoc = $pdfDoc->storeAs($folder, $filename, 'public');
                 }
 
                 $numeroLimpio = ltrim($docData['numero'], '0');
@@ -98,7 +102,7 @@ class OficioController extends Controller
                     'numero' => $numeroFormateado,
                     'anio' => now()->format('Y'),
                     'num_anio' => $numAnio,
-                    'asunto' => mb_strtoupper($docData['asunto'], 'UTF-8'),
+                    //'asunto' => mb_strtoupper($docData['asunto'], 'UTF-8'),
                     'resumen' => mb_strtoupper($docData['resumen'], 'UTF-8'),
                     'detalle' => mb_strtoupper($docData['detalle'], 'UTF-8'),
                     'fecha_doc' => $docData['fecha_doc'],
