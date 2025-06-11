@@ -17,7 +17,7 @@ class OficioController extends Controller
         DB::beginTransaction();
 
         try {
-            //Validación básica
+            // Validación básica
             if (!$request->hasFile('pdf_oficio')) {
                 return response()->json(['error' => 'Archivo PDF del oficio no enviado'], 400);
             }
@@ -27,7 +27,7 @@ class OficioController extends Controller
                 return response()->json(['error' => 'Usuario o oficina no encontrada'], 403);
             }
 
-            //Guardar archivo del oficio
+            // Guardar archivo del oficio
             $archivoOficio = $request->file('pdf_oficio');
             $pdfPathOficio = $archivoOficio->store('oficios', 'public');
             $nombreOriginalOficio = $archivoOficio->getClientOriginalName();
@@ -44,6 +44,7 @@ class OficioController extends Controller
                 DB::rollback();
                 return response()->json(['error' => 'Oficio ya existe con número: ' . $numeroLimpioOO], 409);
             }
+
             // Crear el oficio
             $oficio = Oficio::create([
                 'numero' => $request->numero_oficio,
@@ -55,34 +56,39 @@ class OficioController extends Controller
                 'nombre_original_pdf' => $nombreOriginalOficio,
             ]);
 
-            // Crear documentos relacionados
+            // Obtener los documentos enviados como JSON
+            $documentos = [];
+
+            foreach ($request->all() as $key => $value) {
+                if (strpos($key, 'documento_') === 0) {
+                    $documentos[] = json_decode($value, true);
+                }
+            }
+
             $documentosCreados = [];
 
-            foreach ($request->documentos as $docData) {
-                // Validar clase_documento
+            foreach ($documentos as $index => $docData) {
                 $claseDocumento = OficinaDocumento::find($docData['clase_documento_id']);
                 if (!$claseDocumento) {
                     DB::rollback();
                     return response()->json(['error' => 'Clase de documento no encontrada: ' . $docData['clase_documento_id']], 404);
                 }
 
+                // Manejo del archivo del documento
                 $pdfPathDoc = null;
                 $nombreOriginalDoc = null;
 
-                if (isset($docData['pdf']) && $docData['pdf'] instanceof \Illuminate\Http\UploadedFile) {
-                    $pdfDoc = $docData['pdf'];
+                if ($request->hasFile('pdf_documento_' . $index)) {
+                    $pdfDoc = $request->file('pdf_documento_' . $index);
                     $nombreOriginalDoc = $pdfDoc->getClientOriginalName();
 
-                    // Carpeta con fecha (opcional): documentos/2025/06/11
+                    // Carpeta con fecha
                     $folder = 'documentos/' . now()->format('Y/m/d');
-
-                    // Nombre único para el archivo (usando timestamp + hash del nombre original)
                     $filename = time() . '_' . md5($nombreOriginalDoc) . '.' . $pdfDoc->getClientOriginalExtension();
-
-                    // Guarda el archivo usando Storage (disco 'public')
                     $pdfPathDoc = $pdfDoc->storeAs($folder, $filename, 'public');
                 }
 
+                // Generación de nombre y validación del número de documento
                 $numeroLimpio = ltrim($docData['numero'], '0');
                 $numeroFormateado = str_pad($numeroLimpio, 4, '0', STR_PAD_LEFT);
                 $nomenclatura = $claseDocumento->clase_documento->nomenclatura;
@@ -102,10 +108,9 @@ class OficioController extends Controller
                     'numero' => $numeroFormateado,
                     'anio' => now()->format('Y'),
                     'num_anio' => $numAnio,
-                    //'asunto' => mb_strtoupper($docData['asunto'], 'UTF-8'),
                     'resumen' => mb_strtoupper($docData['resumen'], 'UTF-8'),
                     'detalle' => mb_strtoupper($docData['detalle'], 'UTF-8'),
-                    'fecha_doc' => $docData['fecha_doc'],
+                    'fecha_doc' => $docData['fecha'],
                     'fecha_envio' => now(),
                     'oficina_remitente' => $user->oficina->nombre,
                     'oficina_id' => $user->oficina_id,
