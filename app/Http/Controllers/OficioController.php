@@ -328,7 +328,8 @@ class OficioController extends Controller
         $user = auth()->user();
         try {
 
-            $oficios = Oficio::where('oficina_remitente', $user->oficina->nombre)
+            $oficios = Oficio::with('documentos')
+                ->where('oficina_remitente', $user->oficina->nombre)
                 ->get();
 
             DB::commit();
@@ -348,7 +349,8 @@ class OficioController extends Controller
         $user = auth()->user();
         try {
 
-            $oficio = Oficio::where('oficina_remitente', $user->oficina->nombre)
+            $oficio = Oficio::with('documentos')
+                ->where('oficina_remitente', $user->oficina->nombre)
                 ->where('id', $request->id)
                 ->first();
 
