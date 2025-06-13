@@ -211,12 +211,12 @@ class FormularioController extends Controller
                 $query->where('numero', 'like', '%' . $request->numero . '%');
             }
 
-            if ($request->filled('asunto')) {
-                $query->where('asunto', 'like', '%' . $request->asunto . '%');
+            if ($request->filled('resumen')) {
+                $query->where('resumen', 'like', '%' . $request->asunto . '%');
             }
 
-            if ($request->filled('resumen')) {
-                $query->where('resumen', 'like', '%' . $request->resumen . '%');
+            if ($request->filled('detalle')) {
+                $query->where('detalle', 'like', '%' . $request->resumen . '%');
             }
 
             if ($request->filled('fecha_doc')) {

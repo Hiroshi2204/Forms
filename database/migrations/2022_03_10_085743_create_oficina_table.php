@@ -16,6 +16,7 @@ class CreateOficinaTable extends Migration
         Schema::create('oficina', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->nullable();
+            $table->string('nomenclatura')->nullable();
             $table->foreignId('cargo_oficina_id')->nullable()->references('id')->on('cargo_oficina');
             $table->timestamps();
         });

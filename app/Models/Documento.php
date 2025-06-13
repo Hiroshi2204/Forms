@@ -24,6 +24,7 @@ class Documento extends Model
                             'oficio_id',
                             'pdf_path',
                             'nombre_original_pdf',
+                            'estado_publicacion',
                             'estado_registro'
     );
     protected $primaryKey = 'id';

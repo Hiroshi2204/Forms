@@ -36,6 +36,7 @@ class UserSeeder extends Seeder
         $user1 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ciencias administrativas",
+                "nomenclatura" => "fca",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -54,6 +55,7 @@ class UserSeeder extends Seeder
         $user2 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ciencias contables",
+                "nomenclatura" => "fcc",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -72,6 +74,7 @@ class UserSeeder extends Seeder
         $user3 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ciencias económicas",
+                "nomenclatura" => "fce",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -90,6 +93,7 @@ class UserSeeder extends Seeder
         $user4 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ciencias naturales y matemáticas",
+                "nomenclatura" => "fcnm",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -108,6 +112,7 @@ class UserSeeder extends Seeder
         $user5 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ciencias de la salud",
+                "nomenclatura" => "fcs",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -126,6 +131,7 @@ class UserSeeder extends Seeder
         $user6 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ingeniería ambiental y recursos naturales",
+                "nomenclatura" => "fiarn",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -144,6 +150,7 @@ class UserSeeder extends Seeder
         $user7 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ingeniería eléctrica y electrónica",
+                "nomenclatura" => "fiee",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -162,6 +169,7 @@ class UserSeeder extends Seeder
         $user8 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ingeniería industrial y de sistemas",
+                "nomenclatura" => "fiis",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -180,6 +188,7 @@ class UserSeeder extends Seeder
         $user9 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ingeniería mecánica y energía",
+                "nomenclatura" => "fime",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -198,6 +207,7 @@ class UserSeeder extends Seeder
         $user10 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ingeniería pesquera y alimentos",
+                "nomenclatura" => "fipa",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -216,6 +226,7 @@ class UserSeeder extends Seeder
         $user11 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ingeniería química",
+                "nomenclatura" => "fip",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -234,6 +245,7 @@ class UserSeeder extends Seeder
         $user12 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ciencias de la educación",
+                "nomenclatura" => "fced",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -252,6 +264,7 @@ class UserSeeder extends Seeder
         $user13 = Oficina::firstOrCreate(
             [
                 "nombre" => "Secretaría General",
+                "nomenclatura" => "sg",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -270,6 +283,7 @@ class UserSeeder extends Seeder
         $user14 = Oficina::firstOrCreate(
             [
                 "nombre" => "Unidad de Grados y Titulos",
+                "nomenclatura" => "ugt",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -288,6 +302,7 @@ class UserSeeder extends Seeder
         $user15 = Oficina::firstOrCreate(
             [
                 "nombre" => "Tribunal de Honor",
+                "nomenclatura" => "th",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -306,6 +321,7 @@ class UserSeeder extends Seeder
         $user16 = Oficina::firstOrCreate(
             [
                 "nombre" => "Comision Permanente de Fiscalizacion",
+                "nomenclatura" => "cpf",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -324,6 +340,7 @@ class UserSeeder extends Seeder
         $user17 = Oficina::firstOrCreate(
             [
                 "nombre" => "Comite Electoral Universitario",
+                "nomenclatura" => "ceu",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -342,6 +359,7 @@ class UserSeeder extends Seeder
         $user18 = Oficina::firstOrCreate(
             [
                 "nombre" => "Escuela de Postgrado",
+                "nomenclatura" => "ep",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -360,6 +378,7 @@ class UserSeeder extends Seeder
         $user19 = Oficina::firstOrCreate(
             [
                 "nombre" => "Vice Rectorado de Investigación (VRI)",
+                "nomenclatura" => "vri",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -378,6 +397,7 @@ class UserSeeder extends Seeder
         $user20 = Oficina::firstOrCreate(
             [
                 "nombre" => "Vice Rectorado Academico (VRA)",
+                "nomenclatura" => "vra",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -396,6 +416,7 @@ class UserSeeder extends Seeder
         $user21 = Oficina::firstOrCreate(
             [
                 "nombre" => "Defensoria Universitaria (ODU)",
+                "nomenclatura" => "odu",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -414,6 +435,7 @@ class UserSeeder extends Seeder
         $user22 = Oficina::firstOrCreate(
             [
                 "nombre" => "Unidad de Contabilidad",
+                "nomenclatura" => "uc",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -432,6 +454,7 @@ class UserSeeder extends Seeder
         $user23 = Oficina::firstOrCreate(
             [
                 "nombre" => "Unidad Ejecutora de Inversiones",
+                "nomenclatura" => "uei",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -450,6 +473,7 @@ class UserSeeder extends Seeder
         $user24 = Oficina::firstOrCreate(
             [
                 "nombre" => "Oficina de Planeamiento y Presupuesto",
+                "nomenclatura" => "opp",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -468,6 +492,7 @@ class UserSeeder extends Seeder
         $user25 = Oficina::firstOrCreate(
             [
                 "nombre" => "Unidad de Recursos humanos",
+                "nomenclatura" => "urh",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -486,6 +511,7 @@ class UserSeeder extends Seeder
         $user26 = Oficina::firstOrCreate(
             [
                 "nombre" => "Bienestar Universitario (OBU)",
+                "nomenclatura" => "obu",
                 "cargo_oficina_id" => 1
             ]
         );
@@ -504,6 +530,7 @@ class UserSeeder extends Seeder
         $user27 = Oficina::firstOrCreate(
             [
                 "nombre" => "Unidad de Abastecimiento",
+                "nomenclatura" => "ua",
                 "cargo_oficina_id" => 1
             ]
         );

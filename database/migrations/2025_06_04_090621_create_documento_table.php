@@ -29,6 +29,7 @@ class CreateDocumentoTable extends Migration
             $table->foreignId('oficio_id')->nullable()->references('id')->on('oficio');
             $table->string('pdf_path')->nullable();
             $table->string('nombre_original_pdf')->nullable();
+            $table->boolean('estado_publicacion')->default(false);
             $table->char('estado_registro')->default('A');
             $table->timestamps();
         });

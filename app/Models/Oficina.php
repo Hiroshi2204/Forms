@@ -11,6 +11,7 @@ class Oficina extends Model
     protected $table = 'oficina';
     protected $fillable = array(
                             'nombre',
+                            'nomenclatura',
                             'cargo_oficina_id'
                         );
     protected $primaryKey = 'id';

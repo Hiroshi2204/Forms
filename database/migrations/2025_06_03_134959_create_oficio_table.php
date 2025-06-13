@@ -18,10 +18,11 @@ class CreateOficioTable extends Migration
             $table->string('numero')->nullable();
             $table->string('oficina_remitente')->nullable();
             $table->string('codigo')->nullable();
-            $table->date('fecha_ofi')->nullable();
+            //$table->date('fecha_ofi')->nullable();
             $table->date('fecha_envio')->nullable();
             $table->string('pdf_path')->nullable();
             $table->string('nombre_original_pdf')->nullable();
+            $table->boolean('estado_publicacion')->default(false);
             $table->char('estado_registro')->default('A');
             $table->timestamps();
         });
