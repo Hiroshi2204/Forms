@@ -731,9 +731,7 @@ class OficioController extends Controller
                 ->where('id', $request->id)
                 ->where('estado_registro', 'A')
                 ->first();
-
             DB::commit();
-
             return response()->json([
                 'oficio' => $oficio,
             ]);
