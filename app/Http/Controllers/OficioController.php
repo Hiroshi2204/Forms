@@ -718,7 +718,7 @@ class OficioController extends Controller
     }
 
 
-    public function get_oficios_id(Request $request)
+    public function get_oficios_id1(Request $request)
     {
         DB::beginTransaction();
         $user = auth()->user();
@@ -738,6 +738,38 @@ class OficioController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(["error" => "Error al obtener los oficios y documentos: " . $e->getMessage()], 500);
+        }
+    }
+    public function get_oficios_id(Request $request)
+    {
+        DB::beginTransaction();
+        $user = auth()->user();
+
+        try {
+            // Construimos la consulta base
+            $query = Oficio::with(['documentos' => function ($q) {
+                $q->where('estado_registro', 'A');
+            }])
+                ->where('id', $request->id)
+                ->where('estado_registro', 'A');
+
+
+            if (!$user->rol->id == 1) {
+                $query->where('oficina_remitente', $user->oficina->nombre);
+            }
+
+            $oficio = $query->first();
+
+            DB::commit();
+
+            return response()->json([
+                'oficio' => $oficio,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                "error" => "Error al obtener los oficios y documentos: " . $e->getMessage()
+            ], 500);
         }
     }
 }
