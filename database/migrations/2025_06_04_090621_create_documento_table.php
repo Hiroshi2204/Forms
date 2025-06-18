@@ -30,6 +30,7 @@ class CreateDocumentoTable extends Migration
             $table->string('pdf_path')->nullable();
             $table->string('nombre_original_pdf')->nullable();
             $table->boolean('estado_publicacion')->default(false);
+            $table->date('fecha_publicacion')->nullable();
             $table->char('estado_registro')->default('A');
             $table->timestamps();
         });

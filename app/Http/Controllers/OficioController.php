@@ -10,6 +10,7 @@ use App\Models\Oficio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Psy\Command\WhereamiCommand;
 
 class OficioController extends Controller
 {
@@ -271,7 +272,6 @@ class OficioController extends Controller
             return response()->json(["error" => "Error al actualizar el oficio" . $e->getMessage()], 500);
         }
     }
-
     public function update_COPY3(Request $request)
     {
         DB::beginTransaction();
@@ -764,6 +764,71 @@ class OficioController extends Controller
 
             return response()->json([
                 'oficio' => $oficio,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                "error" => "Error al obtener los oficios y documentos: " . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+    public function get_oficios_pendientes()
+    {
+        DB::beginTransaction();
+        $user = auth()->user();
+
+        try {
+            // Si el usuario es administrador (rol = 1), obtiene todos los oficios
+            if ($user->rol->id == 1) {
+                $oficios = Oficio::with('documentos')
+                ->where('estado_publicacion',0)
+                ->get();
+            } else {
+                // Si es usuario común (rol = 2), solo los de su oficina
+                $oficios = Oficio::with('documentos')
+                    ->where('oficina_remitente', $user->oficina->nombre)
+                    ->where('estado_publicacion',0)
+                    ->get();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'oficios' => $oficios,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                "error" => "Error al obtener los oficios y documentos: " . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function get_oficios_publicados()
+    {
+        DB::beginTransaction();
+        $user = auth()->user();
+
+        try {
+            // Si el usuario es administrador (rol = 1), obtiene todos los oficios
+            if ($user->rol->id == 1) {
+                $oficios = Oficio::with('documentos')
+                ->where('estado_publicacion',1)
+                ->get();
+            } else {
+                // Si es usuario común (rol = 2), solo los de su oficina
+                $oficios = Oficio::with('documentos')
+                    ->where('oficina_remitente', $user->oficina->nombre)
+                    ->where('estado_publicacion',1)
+                    ->get();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'oficios' => $oficios,
             ]);
         } catch (\Exception $e) {
             DB::rollback();

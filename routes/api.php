@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AntecedentesPersonalesController;
@@ -36,20 +37,21 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
     Route::get('documentos/buscar/resumen', [FormularioController::class, 'buscar_resumen']);
     Route::get('documentos/buscar/fecha', [FormularioController::class, 'buscar_fecha']);
     Route::get('documentos/buscar/busqueda_documentos_parametros', [FormularioController::class, 'buscar_parametro']);
-
     Route::get('documentos/get', [FormularioController::class, 'get']);
+    Route::get('documentos/get_oficinas', [FormularioController::class, 'get_oficinas']);
+    Route::get('documentos/get_id', [FormularioController::class, 'get_id']);
+    Route::post('documentos/eliminar', [FormularioController::class, 'eliminar']);
+    Route::post('/documentos/descargar', [FormularioController::class, 'descargarPdf']);
+    Route::get('documentos/get/documentos', [FormularioController::class, 'filtro']);
+    Route::get('documentos/get/oficio', [OficioController::class, 'filtro_oficio']);
+
     Route::get('oficios/get_documentos', [OficioController::class, 'get_oficios_documentos']);
     Route::get('oficios/get', [OficioController::class, 'get_oficios']);
     Route::get('oficios/get_id', [OficioController::class, 'get_oficios_id']);
-    Route::get('documentos/get_oficinas', [FormularioController::class, 'get_oficinas']);
-    Route::get('documentos/get_id', [FormularioController::class, 'get_id']);
-
-    Route::post('documentos/eliminar', [FormularioController::class, 'eliminar']);
-
-    Route::post('/documentos/descargar', [FormularioController::class, 'descargarPdf']);
-
-    Route::get('documentos/get/documentos', [FormularioController::class, 'filtro']);
-    Route::get('documentos/get/oficio', [OficioController::class, 'filtro_oficio']);
+    Route::post('oficios/publicar', [AdminController::class, 'publicar']);
+    Route::post('oficios/despublicar', [AdminController::class, 'despublicar']);
+    Route::get('oficios/get/pendientes', [OficioController::class, 'get_oficios_pendientes']);
+    Route::get('oficios/get/publicados', [OficioController::class, 'get_oficios_publicados']);
 
     // Actualizar contraseña
     Route::put('password/update', 'AuthController@updatePassword');
