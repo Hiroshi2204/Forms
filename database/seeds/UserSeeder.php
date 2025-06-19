@@ -271,12 +271,12 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user13->id,
-                "username" => "secretaria",
+                "username" => "sg",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "secretaria123",
+                "password" => "sg123",
             ]
         );
         //------------------------------------------------
@@ -290,12 +290,12 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user14->id,
-                "username" => "unidad",
+                "username" => "ugt",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "unidad123",
+                "password" => "ugt123",
             ]
         );
         //------------------------------------------------
@@ -309,12 +309,12 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user15->id,
-                "username" => "tribunal",
+                "username" => "th",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "tribunal123",
+                "password" => "th123",
             ]
         );
         //------------------------------------------------
@@ -328,12 +328,12 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user16->id,
-                "username" => "comision",
+                "username" => "cpf",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "comision123",
+                "password" => "cpf123",
             ]
         );
         //------------------------------------------------
@@ -347,12 +347,12 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user17->id,
-                "username" => "comite",
+                "username" => "ceu",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "comite123",
+                "password" => "ceu123",
             ]
         );
         //------------------------------------------------
@@ -366,12 +366,12 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user18->id,
-                "username" => "escuela",
+                "username" => "ep",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "escuela123",
+                "password" => "ep123",
             ]
         );
         //------------------------------------------------
@@ -442,31 +442,31 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user22->id,
-                "username" => "unidad1",
+                "username" => "uc",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "unidad1234",
+                "password" => "uc123",
             ]
         );
         //------------------------------------------------
         $user23 = Oficina::firstOrCreate(
             [
                 "nombre" => "Unidad Ejecutora de Inversiones",
-                "nomenclatura" => "uei",
+                "nomenclatura" => "ui",
                 "cargo_oficina_id" => 1
             ]
         );
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user23->id,
-                "username" => "unidad2",
+                "username" => "ui2",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "unidad12345",
+                "password" => "ui123",
             ]
         );
         //------------------------------------------------
@@ -480,12 +480,12 @@ class UserSeeder extends Seeder
         $usuario = User::firstOrCreate(
             [
                 "oficina_id" => $user24->id,
-                "username" => "oficina",
+                "username" => "opp",
                 "rol_id" => 2,
 
             ],
             [
-                "password" => "oficina123",
+                "password" => "opp123",
             ]
         );
         //------------------------------------------------

@@ -8,6 +8,7 @@ use App\Http\Controllers\ClinicaLocalController;
 use App\Http\Controllers\Empresa\EmpresaPaqueteController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\OficioController;
+use App\Http\Controllers\ReportePDFController;
 use App\Models\Rol;
 
 /*
@@ -55,6 +56,10 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
 
     // Actualizar contraseña
     Route::put('password/update', 'AuthController@updatePassword');
+
+    //Reportes en PDF
+    Route::get('reporte/oficios/ejemplo/pdf', [ReportePDFController::class, 'descargarReporteEjemplo'])->name('reporte.oficios.descargar');
+
 
 });
 /*Route::middleware('auth:api')->get('/user', function (Request $request) {
