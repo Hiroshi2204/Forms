@@ -16,7 +16,7 @@ class ClaseDocumentoSeeder extends Seeder
     {
         ClaseDocumento::firstOrcreate([
             "nombre"=>"RESOLUCIONES DECANALES",
-            "nomenclatura"=>"R",
+            "nomenclatura"=>"RD",
             "tipo_transparencia_id"=>1,
         ]);
 
@@ -40,7 +40,7 @@ class ClaseDocumentoSeeder extends Seeder
 
         ClaseDocumento::firstOrcreate([
             "nombre"=>"RESOLUCIONES RECTORALES",
-            "nomenclatura"=>"R",
+            "nomenclatura"=>"RR",
             "tipo_transparencia_id"=>2,
         ]);
 

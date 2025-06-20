@@ -47,33 +47,6 @@
 
     <h3>El si guiente reporte muestra todos los oficios que serán publicados en el portal de transparencia de la universidad</h3>
 
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Oficina</th>
-                <th>N° de Oficio</th>
-                <th>Asunto</th>
-                <th>Fecha de Envío</th>
-                <!-- <th>Estado</th> -->
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($oficios as $i => $oficio)
-            <tr>
-                <td>{{ $i + 1 }}</td>
-                <td>{{ $oficio->oficina_remitente }}</td>
-                <td>{{ $oficio->codigo }}</td>
-                <td>Envío de Información para
-                    publicación en el Portal de
-                    Transparencia y acceso a la
-                    información Pública </td>
-                <td>{{ \Carbon\Carbon::parse($oficio->fecha_envio)->format('d/m/Y') }}</td>
-                <!-- <td>{{ $oficio->estado_publicacion ? 'Publicado' : 'No Publicado' }}</td> -->
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
 
 </body>
 

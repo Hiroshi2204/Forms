@@ -14,7 +14,7 @@ use Psy\Command\WhereamiCommand;
 
 class OficioController extends Controller
 {
-    public function store(Request $request)
+    public function store1(Request $request)
     {
         DB::beginTransaction();
 
@@ -69,10 +69,13 @@ class OficioController extends Controller
             $documentosCreados = [];
 
             foreach ($documentos as $index => $docData) {
-                $claseDocumento = OficinaDocumento::find($docData['clase_documento_id']);
-                if (!$claseDocumento) {
+                $oficinaDocumento = OficinaDocumento::with('clase_documento')
+                    ->where('oficina_id', $user->oficina_id)
+                    ->where('clase_documento_id', $docData['clase_documento_id'])
+                    ->first();
+                if (!$oficinaDocumento || !$oficinaDocumento->clase_documento) {
                     DB::rollback();
-                    return response()->json(['error' => 'Clase de documento no encontrada: ' . $docData['clase_documento_id']], 404);
+                    return response()->json(['error' => 'Clase de documento o nomenclatura no encontrada: ' . $docData['clase_documento_id']], 404);
                 }
                 $claseOficina = Oficina::find($user->oficina_id);
 
@@ -92,7 +95,7 @@ class OficioController extends Controller
                 // Generación de nombre y validación del número de documento
                 $numeroLimpio = ltrim($docData['numero'], '0');
                 $numeroFormateado = str_pad($numeroLimpio, 4, '0', STR_PAD_LEFT);
-                $nomenclatura = $claseDocumento->clase_documento->nomenclatura;
+                $nomenclatura = $oficinaDocumento->clase_documento->nomenclatura;
                 $nomenclatura_oficina = $claseOficina->nomenclatura;
                 $numAnio = $numeroFormateado . "-" . now()->format('Y') . "-" . $nomenclatura . "-" . $nomenclatura_oficina;
 
@@ -150,6 +153,155 @@ class OficioController extends Controller
             return response()->json(["error" => "Error al crear el oficio y documentos: " . $e->getMessage()], 500);
         }
     }
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            if (!$request->hasFile('pdf_oficio')) {
+                return response()->json(['error' => 'Archivo PDF del oficio no enviado'], 400);
+            }
+
+            $user = auth()->user();
+            if (!$user || !$user->oficina) {
+                return response()->json(['error' => 'Usuario o oficina no encontrada'], 403);
+            }
+
+            // Guardar archivo del oficio
+            $archivoOficio = $request->file('pdf_oficio');
+            $pdfPathOficio = $archivoOficio->store('oficios', 'public');
+            $nombreOriginalOficio = $archivoOficio->getClientOriginalName();
+
+            $numeroLimpioOO = $request->numero_oficio . "-" . now()->format('Y') . "-" . $user->username;
+
+            $existeO = Oficio::where('codigo', $numeroLimpioOO)
+                ->where('estado_registro', 'A')
+                ->exists();
+
+            if ($existeO) {
+                DB::rollback();
+                return response()->json(['error' => 'Oficio ya existe con número: ' . $numeroLimpioOO], 409);
+            }
+
+            // Crear el oficio
+            $oficio = Oficio::create([
+                'numero' => $request->numero_oficio,
+                'oficina_remitente' => $user->oficina->nombre,
+                'codigo' => $numeroLimpioOO,
+                'fecha_envio' => now(),
+                'pdf_path' => $pdfPathOficio,
+                'nombre_original_pdf' => $nombreOriginalOficio,
+            ]);
+
+            $documentos = [];
+            foreach ($request->all() as $key => $value) {
+                if (strpos($key, 'documento_') === 0) {
+                    $documentos[] = json_decode($value, true);
+                }
+            }
+
+            $documentosCreados = [];
+
+            foreach ($documentos as $index => $docData) {
+                // 🔁 ACCESO A NOMENCLATURA SEGÚN TIPO DE USUARIO
+                if ($user->oficina_id == 1) {
+                    // Admin: acceso libre
+                    $claseDocumento = ClaseDocumento::find($docData['clase_documento_id']);
+                    if (!$claseDocumento) {
+                        DB::rollback();
+                        return response()->json(['error' => 'Clase de documento no encontrada: ' . $docData['clase_documento_id']], 404);
+                    }
+                    $nomenclatura = $claseDocumento->nomenclatura;
+                } else {
+                    // Usuario común: acceso restringido
+                    $oficinaDocumento = OficinaDocumento::with('clase_documento')
+                        ->where('oficina_id', $user->oficina_id)
+                        ->where('clase_documento_id', $docData['clase_documento_id'])
+                        ->first();
+
+                    if (!$oficinaDocumento || !$oficinaDocumento->clase_documento) {
+                        DB::rollback();
+                        return response()->json(['error' => 'Clase de documento o nomenclatura no encontrada: ' . $docData['clase_documento_id']], 404);
+                    }
+                    $nomenclatura = $oficinaDocumento->clase_documento->nomenclatura;
+                }
+
+                $claseOficina = Oficina::find($user->oficina_id);
+
+                // Manejo del archivo del documento
+                $pdfPathDoc = null;
+                $nombreOriginalDoc = null;
+
+                if ($request->hasFile('pdf_documento_' . $index)) {
+                    $pdfDoc = $request->file('pdf_documento_' . $index);
+                    $nombreOriginalDoc = $pdfDoc->getClientOriginalName();
+
+                    $folder = 'documentos/' . now()->format('Y/m/d');
+                    $filename = time() . '_' . md5($nombreOriginalDoc) . '.' . $pdfDoc->getClientOriginalExtension();
+                    $pdfPathDoc = $pdfDoc->storeAs($folder, $filename, 'public');
+                }
+
+                // Generación de nombre y validación del número de documento
+                $numeroLimpio = ltrim($docData['numero'], '0');
+                $numeroFormateado = str_pad($numeroLimpio, 4, '0', STR_PAD_LEFT);
+                $nomenclatura_oficina = $claseOficina->nomenclatura;
+                $numAnio = $numeroFormateado . "-" . now()->format('Y') . "-" . $nomenclatura . "-" . $nomenclatura_oficina;
+
+                $existe = Documento::where('num_anio', $numAnio)
+                    ->where('estado_registro', 'A')
+                    ->exists();
+
+                if ($existe) {
+                    DB::rollback();
+                    return response()->json(['error' => 'Documento ya existe con número: ' . $numAnio], 409);
+                }
+
+                $documento = Documento::create([
+                    'nombre' => mb_strtoupper($docData['nombre'], 'UTF-8'),
+                    'numero' => $numeroFormateado,
+                    'anio' => now()->format('Y'),
+                    'num_anio' => $numAnio,
+                    'resumen' => mb_strtoupper($docData['resumen'], 'UTF-8'),
+                    'detalle' => mb_strtoupper($docData['detalle'], 'UTF-8'),
+                    'fecha_doc' => $docData['fecha'],
+                    'fecha_envio' => now(),
+                    'oficina_remitente' => $user->oficina->nombre,
+                    'oficina_id' => $user->oficina_id,
+                    'clase_documento_id' => $docData['clase_documento_id'],
+                    'pdf_path' => $pdfPathDoc,
+                    'nombre_original_pdf' => $nombreOriginalDoc,
+                    'estado_registro' => 'A',
+                    'oficio_id' => $oficio->id
+                ]);
+
+                $documentosCreados[] = $documento;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'oficio' => [
+                    'numero' => $oficio->numero,
+                    'fecha_ofi' => $oficio->fecha_ofi,
+                    'pdf' => $oficio->pdf_path,
+                ],
+                'documentos' => collect($documentosCreados)->map(function ($doc) {
+                    return [
+                        'numero' => $doc->numero,
+                        'fecha_doc' => $doc->fecha_doc,
+                        'clase_documento_id' => $doc->clase_documento_id,
+                        'pdf' => $doc->pdf_path,
+                        'detalle' => $doc->detalle,
+                        'resumen' => $doc->resumen,
+                    ];
+                }),
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al crear el oficio y documentos: " . $e->getMessage()], 500);
+        }
+    }
+
 
     public function update_copy(Request $request)
     {
@@ -622,29 +774,33 @@ class OficioController extends Controller
 
     public function filtro_oficio()
     {
-        $user = auth()->user();
         DB::beginTransaction();
+        $user = auth()->user();
 
         try {
-            $codigo = Oficio::where('oficina_remitente', $user->oficina->nombre)->value('id');
-            //$anioActual = date('Y');
-            //$oficina = ClaseDocumento::where('oficina_id', $user->oficina_id);
-            $resultados = Oficio::select('codigo')
-                //->where('anio', $anioActual)
-                ->where('oficina_remitente', $user->oficina->nombre)
-                ->where('codigo', $codigo)
-                ->where('estado_registro', 'A')
-                ->distinct()
-                ->get();
+            // Si el usuario es administrador (rol = 1), obtiene todos los oficios
+            if ($user->rol->id == 1) {
+                $oficios = Oficio::select('numero')
+                    ->where('estado_registro', 'A')
+                    ->get();
+            } else {
+                // Si es usuario común (rol = 2), solo los de su oficina
+                $oficios = Oficio::where('oficina_remitente', $user->oficina->nombre)
+                    ->select('numero')
+                    ->where('estado_registro', 'A')
+                    ->get();
+            }
 
             DB::commit();
 
             return response()->json([
-                'documentos' => $resultados
+                'oficios' => $oficios,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+            return response()->json([
+                "error" => "Error al obtener los oficios y documentos: " . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -694,11 +850,11 @@ class OficioController extends Controller
         $user = auth()->user();
 
         try {
-            // Si el usuario es administrador (rol = 1), obtiene todos los oficios
+            // Si el usuario es administrador (rol = 1), obtiene todos los oficios paginados
             if ($user->rol->id == 1) {
                 $oficios = Oficio::with('documentos')->get();
             } else {
-                // Si es usuario común (rol = 2), solo los de su oficina
+                // Si es usuario común (rol = 2), solo los de su oficina paginados
                 $oficios = Oficio::with('documentos')
                     ->where('oficina_remitente', $user->oficina->nombre)
                     ->get();
@@ -716,6 +872,7 @@ class OficioController extends Controller
             ], 500);
         }
     }
+
 
 
     public function get_oficios_id1(Request $request)
@@ -784,13 +941,13 @@ class OficioController extends Controller
             // Si el usuario es administrador (rol = 1), obtiene todos los oficios
             if ($user->rol->id == 1) {
                 $oficios = Oficio::with('documentos')
-                ->where('estado_publicacion',0)
-                ->get();
+                    ->where('estado_publicacion', 0)
+                    ->get();
             } else {
                 // Si es usuario común (rol = 2), solo los de su oficina
                 $oficios = Oficio::with('documentos')
                     ->where('oficina_remitente', $user->oficina->nombre)
-                    ->where('estado_publicacion',0)
+                    ->where('estado_publicacion', 0)
                     ->get();
             }
 
@@ -815,13 +972,13 @@ class OficioController extends Controller
             // Si el usuario es administrador (rol = 1), obtiene todos los oficios
             if ($user->rol->id == 1) {
                 $oficios = Oficio::with('documentos')
-                ->where('estado_publicacion',1)
-                ->get();
+                    ->where('estado_publicacion', 1)
+                    ->get();
             } else {
                 // Si es usuario común (rol = 2), solo los de su oficina
                 $oficios = Oficio::with('documentos')
                     ->where('oficina_remitente', $user->oficina->nombre)
-                    ->where('estado_publicacion',1)
+                    ->where('estado_publicacion', 1)
                     ->get();
             }
 

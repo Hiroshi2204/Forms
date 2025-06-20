@@ -58,7 +58,8 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
     Route::put('password/update', 'AuthController@updatePassword');
 
     //Reportes en PDF
-    Route::get('reporte/oficios/ejemplo/pdf', [ReportePDFController::class, 'descargarReporteEjemplo'])->name('reporte.oficios.descargar');
+    Route::get('reporte/oficios/ejemplo/pdf', [ReportePDFController::class, 'descargarReporteEjemplo'])->name('reporte.oficios');
+    Route::get('reporte/oficios/facultades/pdf', [ReportePDFController::class, 'descargarReporte_facultades'])->name('reporte.oficios.facultades');
 
 
 });
