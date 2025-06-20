@@ -54,6 +54,7 @@ class AdminController extends Controller
     public function despublicar(Request $request)
 {
     DB::beginTransaction();
+
     $user = auth()->user();
 
     try {
