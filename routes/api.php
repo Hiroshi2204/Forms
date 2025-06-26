@@ -9,6 +9,7 @@ use App\Http\Controllers\Empresa\EmpresaPaqueteController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\OficioController;
 use App\Http\Controllers\ReportePDFController;
+use App\Http\Controllers\VistaController;
 use App\Models\Rol;
 
 /*
@@ -21,6 +22,7 @@ use App\Models\Rol;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 
 
 Route::group(['middleware' => ['cors']], function () {
@@ -59,10 +61,14 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
 
     //Reportes en PDF
     Route::get('reporte/oficios/ejemplo/pdf', [ReportePDFController::class, 'descargarReporteEjemplo'])->name('reporte.oficios');
-    Route::get('    ', [ReportePDFController::class, 'descargarReporte_facultades'])->name('reporte.oficios.facultades');
+    Route::get('reporte/descargar/facultades/pdf', [ReportePDFController::class, 'descargarReporte_facultades'])->name('reporte.oficios.facultades');
 
 
 });
 /*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });*/
+
+Route::get('vistas/documentos', [VistaController::class, 'buscar_parametro']);
+Route::get('vistas/get/oficinas', [VistaController::class, 'get_oficinas_public']);
+Route::get('vistas/get/oficinas/facultades', [VistaController::class, 'get_oficinas_facultades']);

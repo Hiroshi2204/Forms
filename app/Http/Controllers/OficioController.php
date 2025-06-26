@@ -994,4 +994,21 @@ class OficioController extends Controller
             ], 500);
         }
     }
+
+    public function get_oficinas_public()
+    {
+        DB::beginTransaction();
+        try {
+            $resultados = Oficina::select('id', 'nombre')
+                ->where('id', '<>', 1)
+                ->get();
+
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
 }

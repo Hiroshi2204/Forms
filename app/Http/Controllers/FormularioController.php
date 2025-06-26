@@ -212,28 +212,38 @@ class FormularioController extends Controller
             }
 
             if ($request->filled('resumen')) {
-                $query->where('resumen', 'like', '%' . $request->asunto . '%');
+                $query->where('resumen', 'like', '%' . $request->resumen . '%');
             }
 
             if ($request->filled('detalle')) {
-                $query->where('detalle', 'like', '%' . $request->resumen . '%');
+                $query->where('detalle', 'like', '%' . $request->detalle . '%');
             }
 
             if ($request->filled('fecha_doc')) {
                 $query->where('fecha_doc', 'like', '%' . $request->fecha_doc . '%');
             }
 
+            // Filtro por rango de fechas
+            if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+                $query->whereBetween('fecha_doc', [$request->fecha_inicio, $request->fecha_fin]);
+            }
+
             if ($request->filled('oficina_id')) {
                 $query->where('oficina_id', 'like', '%' . $request->oficina_id . '%');
             }
 
-            // Oficio (relación directa)
             if ($request->filled('oficio_id')) {
-                $query->where('oficio_id', $request->oficio_id);  // Asumiendo que Documento tiene oficio_id como FK
+                $query->where('oficio_id', $request->oficio_id);
             }
 
             if ($request->filled('nombre_original_pdf')) {
                 $query->where('nombre_original_pdf', 'like', '%' . $request->nombre_original_pdf . '%');
+            }
+
+            if ($request->filled('orden_campo') && $request->filled('orden_direccion')) {
+                $query->orderBy($request->orden_campo, $request->orden_direccion);
+            } else {
+                $query->orderByDesc('fecha_doc'); // orden por defecto si no se envía ordenamiento
             }
 
             $resultados = $query->paginate(10);
@@ -378,8 +388,8 @@ class FormularioController extends Controller
         DB::beginTransaction();
         try {
             $resultados = Oficina::select('id', 'nombre')
-            ->where('id', '<>', 1)
-            ->get();
+                ->where('id', '<>', 1)
+                ->get();
 
             return response()->json([
                 'documentos' => $resultados
