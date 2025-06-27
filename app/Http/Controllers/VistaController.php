@@ -179,4 +179,21 @@ class VistaController extends Controller
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }
+
+    public function get_documentos_facultades_public()
+    {
+        DB::beginTransaction();
+        try {
+            $resultados = Documento::
+            with('oficina')
+            ->whereBetween('oficina_id', [2, 13])
+            ->get();
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
 }

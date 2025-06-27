@@ -226,7 +226,7 @@ class UserSeeder extends Seeder
         $user11 = Oficina::firstOrCreate(
             [
                 "nombre" => "Facultad de ingeniería química",
-                "nomenclatura" => "fip",
+                "nomenclatura" => "fiq",
                 "cargo_oficina_id" => 1
             ]
         );
