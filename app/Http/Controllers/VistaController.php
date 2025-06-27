@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClaseDocumento;
 use App\Models\Documento;
 use App\Models\Oficina;
 use Illuminate\Http\Request;
@@ -139,6 +140,10 @@ class VistaController extends Controller
                 $query->where('oficio_id', $request->oficio_id);
             }
 
+            if ($request->filled('clase_documento_id')) {
+                $query->where('clase_documento_id', $request->clase_documento_id);
+            }
+
             if ($request->filled('nombre_original_pdf')) {
                 $query->where('nombre_original_pdf', 'like', '%' . $request->nombre_original_pdf . '%');
             }
@@ -153,6 +158,24 @@ class VistaController extends Controller
 
             return response()->json($resultados);
         } catch (\Exception $e) {
+            return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
+        }
+    }
+
+    public function get_normas_documentos_public()
+    {
+        DB::beginTransaction();
+        try {
+            $resultados = ClaseDocumento::select('id', 'nombre')
+                ->whereBetween('id', [4, 22])
+                ->where('id', '!=', 10)
+                ->get();
+
+            return response()->json([
+                'documentos' => $resultados
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
             return response()->json(["error" => "Error al obtener las resoluciones: " . $e->getMessage()], 500);
         }
     }

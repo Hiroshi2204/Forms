@@ -69,6 +69,8 @@ Route::group(['middleware' => ['jwt.verify', 'cors']], function () {
     return $request->user();
 });*/
 
-Route::get('vistas/documentos', [VistaController::class, 'buscar_parametro']);
+Route::get('vistas/buscar/documentos/facultades', [VistaController::class, 'buscar_parametro']);
+Route::get('vistas/buscar/documentos/normas_resoluciones', [VistaController::class, 'buscar_normas_resoluciones']);
 Route::get('vistas/get/oficinas', [VistaController::class, 'get_oficinas_public']);
 Route::get('vistas/get/oficinas/facultades', [VistaController::class, 'get_oficinas_facultades']);
+Route::get('vistas/get/normas_resoluciones/clase_documentos', [VistaController::class, 'get_normas_documentos_public']);

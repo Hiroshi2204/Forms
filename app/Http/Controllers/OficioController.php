@@ -169,8 +169,10 @@ class OficioController extends Controller
 
             // Guardar archivo del oficio
             $archivoOficio = $request->file('pdf_oficio');
-            $pdfPathOficio = $archivoOficio->store('oficios', 'public');
+            // $pdfPathOficio = $archivoOficio->store('oficios', 'public');
+            // $nombreOriginalOficio = $archivoOficio->getClientOriginalName();
             $nombreOriginalOficio = $archivoOficio->getClientOriginalName();
+            $pdfPathOficio = $archivoOficio->storeAs('oficios', $nombreOriginalOficio, 'public');
 
             $numeroLimpioOO = $request->numero_oficio . "-" . now()->format('Y') . "-" . $user->username;
 
@@ -236,9 +238,17 @@ class OficioController extends Controller
                     $pdfDoc = $request->file('pdf_documento_' . $index);
                     $nombreOriginalDoc = $pdfDoc->getClientOriginalName();
 
+                    // $folder = 'documentos/' . now()->format('Y/m/d');
+                    // $filename = time() . '_' . md5($nombreOriginalDoc) . '.' . $pdfDoc->getClientOriginalExtension();
+                    // $pdfPathDoc = $pdfDoc->storeAs($folder, $filename, 'public');
                     $folder = 'documentos/' . now()->format('Y/m/d');
-                    $filename = time() . '_' . md5($nombreOriginalDoc) . '.' . $pdfDoc->getClientOriginalExtension();
-                    $pdfPathDoc = $pdfDoc->storeAs($folder, $filename, 'public');
+                    //$pdfPathDoc = $pdfDoc->storeAs($folder, $nombreOriginalDoc, 'public');
+                    $timestamp = now()->format('His');
+                    $filename = pathinfo($nombreOriginalDoc, PATHINFO_FILENAME);
+                    $extension = $pdfDoc->getClientOriginalExtension();
+                    $filenameWithTimestamp = $filename . '_' . $timestamp . '.' . $extension;
+
+                    $pdfPathDoc = $pdfDoc->storeAs($folder, $filenameWithTimestamp, 'public');
                 }
 
                 // Generación de nombre y validación del número de documento
@@ -681,11 +691,23 @@ class OficioController extends Controller
             $oficio->codigo = $numeroLimpioOO;
 
             // Si se envió nuevo PDF
+            // if ($request->hasFile('pdf')) {
+            //     $archivo = $request->file('pdf');
+            //     $path = $archivo->store('pdfs', 'public');
+            //     $oficio->pdf_path = $path;
+            //     $oficio->nombre_original_pdf = $archivo->getClientOriginalName();
+            // }
             if ($request->hasFile('pdf')) {
                 $archivo = $request->file('pdf');
-                $path = $archivo->store('pdfs', 'public');
-                $oficio->pdf_path = $path;
-                $oficio->nombre_original_pdf = $archivo->getClientOriginalName();
+                $nombreOriginal = $archivo->getClientOriginalName();
+                $timestamp = now()->format('His');
+                $filename = pathinfo($nombreOriginal, PATHINFO_FILENAME);
+                $extension = $archivo->getClientOriginalExtension();
+                $nombreFinal = $filename . '_' . $timestamp . '.' . $extension;
+
+                $ruta = $archivo->storeAs('pdfs', $nombreFinal, 'public');
+                $oficio->pdf_path = $ruta;
+                $oficio->nombre_original_pdf = $nombreOriginal;
             }
 
             $oficio->save();
@@ -737,20 +759,31 @@ class OficioController extends Controller
 
                     // Subir PDF si se envió archivo
                     $archivoKey = "archivo_documento_$index";
+                    // if ($request->hasFile($archivoKey)) {
+                    //     $archivoDoc = $request->file($archivoKey);
+                    //     $ruta = $archivoDoc->store('pdfs', 'public');
+                    //     $res->pdf_path = $ruta;
+                    //     $res->nombre_original_pdf = $archivoDoc->getClientOriginalName();
+                    //     $res->save();
+                    // }
                     if ($request->hasFile($archivoKey)) {
                         $archivoDoc = $request->file($archivoKey);
-                        $ruta = $archivoDoc->store('pdfs', 'public');
+                        $nombreOriginal = $archivoDoc->getClientOriginalName();
+                        $timestamp = now()->format('His');
+                        $filename = pathinfo($nombreOriginal, PATHINFO_FILENAME);
+                        $extension = $archivoDoc->getClientOriginalExtension();
+                        $nombreFinal = $filename . '_' . $timestamp . '.' . $extension;
+
+                        $folder = 'documentos/' . now()->format('Y/m/d');
+                        $ruta = $archivo->storeAs($folder, $nombreFinal, 'public');
                         $res->pdf_path = $ruta;
-                        $res->nombre_original_pdf = $archivoDoc->getClientOriginalName();
+                        $res->nombre_original_pdf = $nombreOriginal;
                         $res->save();
                     }
 
                     $resolucionesIdsEnviadas[] = $res->id;
                 }
             }
-
-            // Mantener solo los documentos enviados (no eliminar los no enviados)
-            // Si quieres eliminar los que ya no están, descomenta lo siguiente:
 
             Documento::where('oficio_id', $oficio->id)
                 ->whereNotIn('id', $resolucionesIdsEnviadas)
