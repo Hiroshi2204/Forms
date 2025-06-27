@@ -318,35 +318,99 @@ class OficinaDocumentoSeeder extends Seeder
             "oficina_id"=>26,
             "clase_documento_id"=>37,
         ]);
-        //----------------------------------
         OficinaDocumento::firstOrcreate([
-            "oficina_id"=>27,
+            "oficina_id"=>26,
             "clase_documento_id"=>38,
         ]);
         OficinaDocumento::firstOrcreate([
-            "oficina_id"=>27,
+            "oficina_id"=>26,
             "clase_documento_id"=>39,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>40,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>41,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>42,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>43,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>44,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>45,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>46,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>47,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>48,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>49,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>50,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>51,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>52,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>26,
+            "clase_documento_id"=>53,
+        ]);
+        //----------------------------------
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>27,
+            "clase_documento_id"=>54,
+        ]);
+        OficinaDocumento::firstOrcreate([
+            "oficina_id"=>27,
+            "clase_documento_id"=>55,
         ]);
         //----------------------------------
         OficinaDocumento::firstOrcreate([
             "oficina_id"=>28,
-            "clase_documento_id"=>40,
+            "clase_documento_id"=>56,
         ]);
         OficinaDocumento::firstOrcreate([
             "oficina_id"=>28,
-            "clase_documento_id"=>41,
+            "clase_documento_id"=>57,
         ]);
         OficinaDocumento::firstOrcreate([
             "oficina_id"=>28,
-            "clase_documento_id"=>42,
+            "clase_documento_id"=>58,
         ]);
         OficinaDocumento::firstOrcreate([
             "oficina_id"=>28,
-            "clase_documento_id"=>43,
+            "clase_documento_id"=>59,
         ]);
         OficinaDocumento::firstOrcreate([
             "oficina_id"=>28,
-            "clase_documento_id"=>44,
+            "clase_documento_id"=>60,
         ]);
     }
 }
