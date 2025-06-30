@@ -103,11 +103,11 @@ class ImportarDocumentosHistoricos extends Command
             $numeroFormateado = str_pad($numeroInt, 4, '0', STR_PAD_LEFT);
 
             $claseNomen = strtolower(ClaseDocumento::find($clase_documento_id)->nomenclatura);
-            $num_anio   = strtoupper("\{$numeroFormateado}-\{$anio}-\{$claseNomen}-\{$fac}");
+            $num_anio   = strtoupper("{$numeroFormateado}-{$anio}-{$claseNomen}-{$fac}");
 
             if (Documento::where('num_anio', $num_anio)->exists()) {
                 ++$duplicados;
-                $this->warn("Duplicado {\$file->getRelativePathname()} (num_anio {\$num_anio})");
+                $this->warn("Duplicado {$file->getRelativePathname()} (num_anio {$num_anio})");
                 Log::notice('[ImportHist] duplicado', ['num_anio' => $num_anio, 'archivo' => $file->getRealPath()]);
                 $bar->advance();
                 continue;
@@ -115,7 +115,7 @@ class ImportarDocumentosHistoricos extends Command
 
             DB::beginTransaction();
             try {
-                $destRelative = "documentos/{\$anio}/{\$fac}/{\$claseNomen}/" . $file->getFilename();
+                $destRelative = "documentos/{$anio}/{$fac}/{$claseNomen}/" . $file->getFilename();
 
                 if (!$dryRun) {
                     Storage::disk('public')->put(
@@ -141,6 +141,8 @@ class ImportarDocumentosHistoricos extends Command
                         'nombre_original_pdf' => $file->getFilename(),
                         'estado_registro'     => 'A',
                         'oficio_id'           => null,
+                        'estado_publicacion'  => 1,
+                        'fecha_publicacion'   => "$anio/01/01"
                     ]);
                 }
 
@@ -149,7 +151,7 @@ class ImportarDocumentosHistoricos extends Command
             } catch (\Throwable $e) {
                 DB::rollBack();
                 ++$errores;
-                $this->error("Error en {\$file->getRelativePathname()}: " . $e->getMessage());
+                $this->error("Error en {$file->getRelativePathname()}: " . $e->getMessage());
                 Log::error('[ImportHist] excepcion', ['archivo' => $file->getRealPath(), 'msg' => $e->getMessage()]);
             }
 

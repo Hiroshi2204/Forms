@@ -169,12 +169,14 @@ class OficioController extends Controller
 
             // Guardar archivo del oficio
             $archivoOficio = $request->file('pdf_oficio');
-            // $pdfPathOficio = $archivoOficio->store('oficios', 'public');
-            // $nombreOriginalOficio = $archivoOficio->getClientOriginalName();
             $nombreOriginalOficio = $archivoOficio->getClientOriginalName();
-            $pdfPathOficio = $archivoOficio->storeAs('oficios', $nombreOriginalOficio, 'public');
+            //$pdfPathOficio = $archivoOficio->storeAs('oficios', $nombreOriginalOficio, 'public');
+            $anioActual = now()->format('Y');
+            $username = strtoupper($user->username);
+            $rutaOficio = "oficios/{$username}/{$anioActual}";
+            $pdfPathOficio = $archivoOficio->storeAs($rutaOficio, $nombreOriginalOficio, 'public');
 
-            $numeroLimpioOO = $request->numero_oficio . "-" . now()->format('Y') . "-" . $user->username;
+            $numeroLimpioOO = $request->numero_oficio . "-" . now()->format('Y') . "-" . strtoupper($user->username);
 
             $existeO = Oficio::where('codigo', $numeroLimpioOO)
                 ->where('estado_registro', 'A')
@@ -205,7 +207,7 @@ class OficioController extends Controller
             $documentosCreados = [];
 
             foreach ($documentos as $index => $docData) {
-                // 🔁 ACCESO A NOMENCLATURA SEGÚN TIPO DE USUARIO
+                // ACCESO A NOMENCLATURA SEGÚN TIPO DE USUARIO
                 if ($user->oficina_id == 1) {
                     // Admin: acceso libre
                     $claseDocumento = ClaseDocumento::find($docData['clase_documento_id']);
@@ -225,7 +227,7 @@ class OficioController extends Controller
                         DB::rollback();
                         return response()->json(['error' => 'Clase de documento o nomenclatura no encontrada: ' . $docData['clase_documento_id']], 404);
                     }
-                    $nomenclatura = $oficinaDocumento->clase_documento->nomenclatura;
+                    $nomenclatura = strtoupper($oficinaDocumento->clase_documento->nomenclatura);
                 }
 
                 $claseOficina = Oficina::find($user->oficina_id);
@@ -237,12 +239,12 @@ class OficioController extends Controller
                 if ($request->hasFile('pdf_documento_' . $index)) {
                     $pdfDoc = $request->file('pdf_documento_' . $index);
                     $nombreOriginalDoc = $pdfDoc->getClientOriginalName();
+                    //$folder = 'documentos/' . now()->format('Y/m/d');
+                    $anioActual = now()->format('Y');
+                    $username = strtoupper($user->username);
+                    $claseDocNombre = strtoupper(str_replace(' ', '_', $oficinaDocumento->clase_documento->nombre ?? 'SIN_NOMBRE'));
 
-                    // $folder = 'documentos/' . now()->format('Y/m/d');
-                    // $filename = time() . '_' . md5($nombreOriginalDoc) . '.' . $pdfDoc->getClientOriginalExtension();
-                    // $pdfPathDoc = $pdfDoc->storeAs($folder, $filename, 'public');
-                    $folder = 'documentos/' . now()->format('Y/m/d');
-                    //$pdfPathDoc = $pdfDoc->storeAs($folder, $nombreOriginalDoc, 'public');
+                    $folder = "documentos/{$username}/{$claseDocNombre}/{$anioActual}";
                     $timestamp = now()->format('His');
                     $filename = pathinfo($nombreOriginalDoc, PATHINFO_FILENAME);
                     $extension = $pdfDoc->getClientOriginalExtension();
@@ -254,7 +256,7 @@ class OficioController extends Controller
                 // Generación de nombre y validación del número de documento
                 $numeroLimpio = ltrim($docData['numero'], '0');
                 $numeroFormateado = str_pad($numeroLimpio, 4, '0', STR_PAD_LEFT);
-                $nomenclatura_oficina = $claseOficina->nomenclatura;
+                $nomenclatura_oficina = strtoupper($claseOficina->nomenclatura);
                 $numAnio = $numeroFormateado . "-" . now()->format('Y') . "-" . $nomenclatura . "-" . $nomenclatura_oficina;
 
                 $existe = Documento::where('num_anio', $numAnio)
@@ -689,14 +691,6 @@ class OficioController extends Controller
             // Actualizar oficio
             $oficio->numero = $request->numero;
             $oficio->codigo = $numeroLimpioOO;
-
-            // Si se envió nuevo PDF
-            // if ($request->hasFile('pdf')) {
-            //     $archivo = $request->file('pdf');
-            //     $path = $archivo->store('pdfs', 'public');
-            //     $oficio->pdf_path = $path;
-            //     $oficio->nombre_original_pdf = $archivo->getClientOriginalName();
-            // }
             if ($request->hasFile('pdf')) {
                 $archivo = $request->file('pdf');
                 $nombreOriginal = $archivo->getClientOriginalName();
@@ -705,8 +699,12 @@ class OficioController extends Controller
                 $extension = $archivo->getClientOriginalExtension();
                 $nombreFinal = $filename . '_' . $timestamp . '.' . $extension;
 
-                $ruta = $archivo->storeAs('pdfs', $nombreFinal, 'public');
-                $oficio->pdf_path = $ruta;
+                //$ruta = $archivo->storeAs('pdfs', $nombreFinal, 'public');
+                $anioActual = now()->format('Y');
+                $username = strtoupper($user->username);
+                $rutaOficio = "oficios/{$username}/{$anioActual}";
+                $rutaO = $archivo->storeAs($rutaOficio, $nombreFinal, 'public');
+                $oficio->pdf_path = $rutaO;
                 $oficio->nombre_original_pdf = $nombreOriginal;
             }
 
@@ -759,13 +757,6 @@ class OficioController extends Controller
 
                     // Subir PDF si se envió archivo
                     $archivoKey = "archivo_documento_$index";
-                    // if ($request->hasFile($archivoKey)) {
-                    //     $archivoDoc = $request->file($archivoKey);
-                    //     $ruta = $archivoDoc->store('pdfs', 'public');
-                    //     $res->pdf_path = $ruta;
-                    //     $res->nombre_original_pdf = $archivoDoc->getClientOriginalName();
-                    //     $res->save();
-                    // }
                     if ($request->hasFile($archivoKey)) {
                         $archivoDoc = $request->file($archivoKey);
                         $nombreOriginal = $archivoDoc->getClientOriginalName();
@@ -774,8 +765,14 @@ class OficioController extends Controller
                         $extension = $archivoDoc->getClientOriginalExtension();
                         $nombreFinal = $filename . '_' . $timestamp . '.' . $extension;
 
-                        $folder = 'documentos/' . now()->format('Y/m/d');
-                        $ruta = $archivo->storeAs($folder, $nombreFinal, 'public');
+                        //$folder = 'documentos/' . now()->format('Y/m/d');
+                        //$ruta = $archivo->storeAs($folder, $nombreFinal, 'public');
+                        $anioActual = now()->format('Y');
+                        $username = strtoupper($user->username);
+                        $claseDocumentoNombre = strtoupper(str_replace(' ', '_', $claseDocumento->nombre ?? 'SIN_NOMBRE'));
+
+                        $folder = "documentos/{$username}/{$claseDocumentoNombre}/{$anioActual}";
+                        $ruta = $archivoDoc->storeAs($folder, $nombreFinal, 'public');
                         $res->pdf_path = $ruta;
                         $res->nombre_original_pdf = $nombreOriginal;
                         $res->save();
