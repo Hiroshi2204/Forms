@@ -17,7 +17,7 @@ class ImportarDocumentosHistoricos extends Command
                             {path : Ruta absoluta a la carpeta "facultades"}
                             {--dry-run : Simula sin escribir en BD ni mover archivos}';
 
-    protected $description = 'Importa PDFs históricos de resoluciones por facultad (dry‏‑run disponible).';
+    protected $description = 'Importa PDFs históricos de resoluciones por facultad (dry‑run disponible).';
 
     public function handle(): int
     {
@@ -53,7 +53,15 @@ class ImportarDocumentosHistoricos extends Command
         $importados = $duplicados = $saltados = $errores = 0;
 
         foreach ($finder as $file) {
-            /** @var \Symfony\Component\Finder\SplFileInfo \$file */
+            /** @var \Symfony\Component\Finder\SplFileInfo $file */
+
+            // ---------- NUEVO LOG DE AVANCE ----------
+            Log::info('[ImportHist] procesando', [
+                'archivo'  => $file->getRealPath(),
+                'relativo' => $file->getRelativePathname()
+            ]);
+            // -----------------------------------------
+
             $relativeDir = $file->getRelativePath();
             $segments    = preg_split('#[\\\/]#', $relativeDir);
 
