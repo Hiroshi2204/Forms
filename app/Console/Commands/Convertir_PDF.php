@@ -6,14 +6,14 @@ use Illuminate\Console\Command;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
-class ConvertWordToPdf extends Command
+class Convertir_PDF extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * Ajusta el signature para pasar la ruta base como argumento
      */
-    protected $signature = 'convert:word-to-pdf {path : Ruta base de la carpeta SG}';
+    protected $signature = 'convert:convertir-pdf {path : Ruta base de la carpeta SG}';
 
     /**
      * The console command description.
