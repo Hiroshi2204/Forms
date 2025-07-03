@@ -169,6 +169,7 @@ class VistaController extends Controller
             $resultados = ClaseDocumento::select('id', 'nombre')
                 ->whereBetween('id', [4, 22])
                 ->where('id', '!=', 10)
+                ->limit(20)
                 ->get();
 
             return response()->json([
@@ -184,10 +185,12 @@ class VistaController extends Controller
     {
         DB::beginTransaction();
         try {
-            $resultados = Documento::
-            with('oficina')
-            ->whereBetween('oficina_id', [2, 13])
-            ->get();
+            $resultados = Documento::with('oficina')
+                ->whereBetween('oficina_id', [2, 13])
+                ->orderBy('fecha_doc', 'desc')
+                ->limit(20) // ✅ Solo los 20 más recientes
+                ->get();
+
             return response()->json([
                 'documentos' => $resultados
             ]);
